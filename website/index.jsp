@@ -56,7 +56,7 @@ html,body {
 			maxSize="320" style="width: 160px;background-color:#e6e6e6">Hi, I'm leading pane</div>
 		<div data-dojo-type="dijit/layout/ContentPane"
 			data-dojo-props="splitter:true, region:'center'">
-			<iframe src="manage/maUser.action" style="width:100%; height:100%" frameborder="0"></iframe>
+			<iframe src="manage/maUser!list.action" style="width:100%; height:100%" frameborder="0"></iframe>
 		</div>
 		<div data-dojo-type="dijit/layout/ContentPane"
 			data-dojo-props="region:'bottom'" style="height: 20px;background-color:#000000">Hi, I'm

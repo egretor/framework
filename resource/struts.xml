@@ -5,6 +5,19 @@
 <struts>
 	<constant name="struts.devMode" value="true" />
 
+	<package name="struts-secutiry" extends="struts-default">
+		<interceptors>
+			<interceptor name="securityInterceptor"
+				class="unknown.website.interceptor.SecurityInterceptor">
+			</interceptor>
+			<interceptor-stack name="secutiryStack">
+				<interceptor-ref name="defaultStack"></interceptor-ref>
+				<interceptor-ref name="securityInterceptor"></interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="secutiryStack" />
+	</package>
+
 	<include file="unknown/website/manage/struts.xml"></include>
 </struts>
 
