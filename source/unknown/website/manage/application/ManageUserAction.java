@@ -2,19 +2,18 @@ package unknown.website.manage.application;
 
 import java.util.List;
 
+import unknown.website.AbstractAction;
 import unknown.website.manage.business.ManageUserBusiness;
 import unknown.website.manage.module.ManageUser;
 
 import com.opensymphony.xwork2.ActionSupport;
 
-public class ManageUserAction extends ActionSupport {
+public class ManageUserAction extends AbstractAction {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	private boolean show;
 
 	private List<ManageUser> manageUsers;
 
@@ -23,14 +22,6 @@ public class ManageUserAction extends ActionSupport {
 		ManageUserBusiness bs = new ManageUserBusiness();
 		this.manageUsers = bs.query();
 		return ActionSupport.SUCCESS;
-	}
-
-	public boolean isShow() {
-		return show;
-	}
-
-	public void setShow(boolean show) {
-		this.show = show;
 	}
 
 	public List<ManageUser> getManageUsers() {

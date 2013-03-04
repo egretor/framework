@@ -25,10 +25,10 @@ public class SecurityInterceptor extends AbstractInterceptor {
 		boolean hasAction = false;
 		if (action != null) {
 			hasAction = true;
-			aa.setShow(false);
+			aa.setAllow(false);
 		}
 		if (hasAction) {
-			aa.setShow(true);
+			aa.setAllow(true);
 			return actionInvocation.invoke();
 		} else {
 			return result;
