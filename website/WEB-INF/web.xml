@@ -2,22 +2,38 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-	id="WebApp_ID" version="3.0">
+	id="Framework" version="3.0">
 	<display-name>Framework</display-name>
 	<context-param>
 		<param-name>WebsiteDirectoryKey</param-name>
 		<param-value>website.directory</param-value>
 	</context-param>
 	<context-param>
-		<param-name>MySQL.ManageInstance.Url</param-name>
-		<param-value>jdbc:mysql://localhost:3306/framework</param-value>
+		<param-name>ManageInstanceName</param-name>
+		<param-value>ManageInstance.MySQL</param-value>
 	</context-param>
 	<context-param>
-		<param-name>MySQL.ManageInstance.User</param-name>
+		<param-name>ManageInstance.Oracle.Url</param-name>
+		<param-value>jdbc:oracle:thin:@localhost:1521:r8a092e</param-value>
+	</context-param>
+	<context-param>
+		<param-name>ManageInstance.Oracle.User</param-name>
 		<param-value>framework</param-value>
 	</context-param>
 	<context-param>
-		<param-name>MySQL.ManageInstance.Password</param-name>
+		<param-name>ManageInstance.Oracle.Password</param-name>
+		<param-value>password</param-value>
+	</context-param>
+	<context-param>
+		<param-name>ManageInstance.MySQL.Url</param-name>
+		<param-value>jdbc:mysql://localhost:3306/framework</param-value>
+	</context-param>
+	<context-param>
+		<param-name>ManageInstance.MySQL.User</param-name>
+		<param-value>framework</param-value>
+	</context-param>
+	<context-param>
+		<param-name>ManageInstance.MySQL.Password</param-name>
 		<param-value>password</param-value>
 	</context-param>
 	<listener>

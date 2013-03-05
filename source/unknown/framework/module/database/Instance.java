@@ -1,5 +1,8 @@
 package unknown.framework.module.database;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import unknown.framework.business.database.AbstractSqlBuilder;
 
 /**
@@ -10,7 +13,9 @@ public class Instance {
 	private String url;
 	private String user;
 	private String password;
+	private boolean capitalSQL;
 	private AbstractSqlBuilder sqlBuilder;
+	private Map<String, String> sqls = new HashMap<String, String>();
 
 	/**
 	 * 名称
@@ -65,6 +70,19 @@ public class Instance {
 	}
 
 	/**
+	 * SQL大写
+	 * 
+	 * @return 是否
+	 */
+	public boolean isCapitalSQL() {
+		return capitalSQL;
+	}
+
+	public void setCapitalSQL(boolean capitalSQL) {
+		this.capitalSQL = capitalSQL;
+	}
+
+	/**
 	 * SQL生成器
 	 * 
 	 * @return SQL生成器
@@ -75,5 +93,37 @@ public class Instance {
 
 	public void setSqlBuilder(AbstractSqlBuilder sqlBuilder) {
 		this.sqlBuilder = sqlBuilder;
+	}
+
+	/**
+	 * 获取SQL
+	 * 
+	 * @param key
+	 *            键
+	 * @return SQL
+	 */
+	public String getSql(String key) {
+		String result = null;
+
+		if (this.sqls.containsKey(key)) {
+			result = this.sqls.get(key);
+		}
+
+		return result;
+	}
+
+	/**
+	 * 赋值SQL
+	 * 
+	 * @param key
+	 *            键
+	 * @param sql
+	 *            SQL
+	 */
+	public void setSql(String key, String sql) {
+		if (this.sqls.containsKey(key)) {
+			this.sqls.remove(key);
+		}
+		this.sqls.put(key, sql);
 	}
 }

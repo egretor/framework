@@ -8,7 +8,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@taglib prefix="s" uri="/struts-tags"%>
-<s:if test="show">
+<s:if test="allow">
 	<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
 <head>
@@ -33,12 +33,30 @@ body {
 	abc123
 	<br />
 	<br />
-	<s:property value="maUsers.size" />
+	<s:property value="manageUsers.size" />
 
 	<br />999999999999999
 	<br />
-	<s:iterator id="maUser" value="maUsers">
-		<s:property value="#maUser.uuid" />
+	<s:iterator id="manageUser" value="manageUsers">
+		<s:property value="#manageUser.uuid" />
+		<br />
+		<s:property value="#manageUser.insertUserId" />
+		<br />
+		<s:property value="#manageUser.insertTimeText" />
+		<br />
+		<s:property value="#manageUser.updateUserId" />
+		<br />
+		<s:property value="#manageUser.updateTime" />
+		<br />
+		<s:property value="#manageUser.remark" />
+		<br />
+		<s:property value="#manageUser.name" />
+		<br />
+		<s:property value="#manageUser.account" />
+		<br />
+		<s:property value="#manageUser.password" />
+		<br />
+		<s:property value="#manageUser.prerogative" />
 		<br />
 	</s:iterator>
 	<%
@@ -62,7 +80,7 @@ body {
 
 								String clazzN = classFiles[j].getName();
 								String clazzName = clazzN.substring(0, end);
-							
+
 								String fullName = ps[i].getName() + "."
 										+ clazzName;
 								if (Class.forName(fullName).getSuperclass()

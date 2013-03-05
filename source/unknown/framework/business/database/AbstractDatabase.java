@@ -37,13 +37,6 @@ public abstract class AbstractDatabase {
 	public abstract Instance getInstance();
 
 	/**
-	 * SQL大写
-	 * 
-	 * @return SQL大写
-	 */
-	public abstract boolean capitalSQL();
-
-	/**
 	 * 访问数据库
 	 * 
 	 * @param operation
@@ -108,25 +101,26 @@ public abstract class AbstractDatabase {
 	 * @return 结果集合
 	 */
 	protected List<Result> statement(Connection connection,
-			List<Operation> Operations) {
+			List<Operation> operations) {
 		List<Result> results = null;
 
 		PreparedStatement preparedStatement = null;
 		results = new ArrayList<Result>();
+		AbstractSqlBuilder sqlBuilder = this.getInstance().getSqlBuilder();
 		try {
-			for (int i = 0; i < Operations.size(); i++) {
+			for (int i = 0; i < operations.size(); i++) {
 				Result result = null;
-				Operation Operation = Operations.get(i);
-				if (Operation != null) {
-					int operationType = Operation.getOperationType();
-					Paging paging = Operation.getPaging();
+				Operation operation = operations.get(i);
+				if (operation != null) {
+					int operationType = operation.getOperationType();
+					Paging paging = operation.getPaging();
 					String sql = null;
-					if (this.capitalSQL()) {
-						sql = Operation.getSql().toUpperCase();
+					if (this.getInstance().isCapitalSQL()) {
+						sql = operation.getSql().toUpperCase();
 					} else {
-						sql = Operation.getSql().toLowerCase();
+						sql = operation.getSql().toLowerCase();
 					}
-					List<Object> parameters = Operation.getParameters();
+					List<Object> parameters = operation.getParameters();
 
 					preparedStatement = connection.prepareStatement(sql);
 					preparedStatement.clearParameters();
@@ -135,7 +129,8 @@ public abstract class AbstractDatabase {
 						while (index < parameters.size()) {
 							Object value = parameters.get(index);
 							index++;
-							preparedStatement.setObject(index, value);
+							Object databaseValue = sqlBuilder.Decode(value);
+							preparedStatement.setObject(index, databaseValue);
 						}
 					}
 
@@ -144,10 +139,8 @@ public abstract class AbstractDatabase {
 						if (paging == null) {
 							result = this.executeQuery(preparedStatement);
 						} else {
-							AbstractSqlBuilder sqlBuilder = this.getInstance()
-									.getSqlBuilder();
 							String rowCountSql = sqlBuilder.rowCount(sql);
-							if (this.capitalSQL()) {
+							if (this.getInstance().isCapitalSQL()) {
 								rowCountSql = rowCountSql.toUpperCase();
 							} else {
 								rowCountSql = rowCountSql.toLowerCase();
@@ -296,7 +289,7 @@ public abstract class AbstractDatabase {
 			}
 			resultSet.close();
 			paging.setRowCount(rowCount);
-			
+
 			result.setDone(true);
 			result.setTable(table);
 			result.setPaging(paging);

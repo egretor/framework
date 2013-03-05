@@ -181,4 +181,8 @@ public abstract class AbstractSqlBuilder {
 	 * @return SQL
 	 */
 	public abstract String delete(String tableName);
+
+	public abstract Object Encode(Class<?> classType, Object value);
+
+	public abstract Object Decode(Object value);
 }

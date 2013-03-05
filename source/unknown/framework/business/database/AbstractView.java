@@ -65,6 +65,7 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 
 		List<Object> values = row.getValues();
 
+		AbstractSqlBuilder sqlBuilder = this.getInstance().getSqlBuilder();
 		Convention convention = new Convention();
 		List<Method> methods = convention.filterSetMethod(result);
 		if (methods != null) {
@@ -78,7 +79,13 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 					String fieldName = convention.decodeName(methodName);
 					if (field.equalsIgnoreCase(fieldName)) {
 						try {
-							method.invoke(result, column);
+							Class<?>[] classes = method.getParameterTypes();
+							if (classes.length == 1) {
+								Object javaValue = sqlBuilder.Encode(
+										classes[0], column);
+								System.out.println(javaValue);
+								method.invoke(result, javaValue);
+							}
 						} catch (IllegalArgumentException e) {
 							Trace.logger().error(e);
 						} catch (IllegalAccessException e) {

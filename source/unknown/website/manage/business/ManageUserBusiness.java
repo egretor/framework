@@ -4,7 +4,7 @@ import java.util.List;
 
 import unknown.website.manage.module.ManageUser;
 
-public class ManageUserBusiness extends AbstractMySQLTable<ManageUser> {
+public class ManageUserBusiness extends AbstractTableBusiness<ManageUser> {
 
 	@Override
 	public List<ManageUser> Unique(ManageUser value) {

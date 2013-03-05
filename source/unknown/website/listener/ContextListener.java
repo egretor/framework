@@ -8,9 +8,8 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import unknown.framework.business.database.Driver;
-import unknown.framework.business.mysql.MySQLSqlBuilder;
 import unknown.framework.module.database.Instance;
-import unknown.website.MySQL;
+import unknown.website.ManageInstance;
 
 /**
  * Application Lifecycle Listener implementation class ContextListener
@@ -63,7 +62,6 @@ public class ContextListener implements ServletContextListener,
 		result.setUrl(servletContext.getInitParameter(urlKey));
 		result.setUser(servletContext.getInitParameter(userKey));
 		result.setPassword(servletContext.getInitParameter(passwordKey));
-		result.setSqlBuilder(new MySQLSqlBuilder());
 
 		return result;
 	}
@@ -79,9 +77,14 @@ public class ContextListener implements ServletContextListener,
 
 		Driver.registerDriver();
 
-		Instance mysqlManageInstance = this.initializeInstance(servletContext,
-				MySQL.MANAGE_INSTANCE_NAME);
-		MySQL.setManageInstance(mysqlManageInstance);
+		Instance manageInstanceOracle = this.initializeInstance(servletContext,
+				ManageInstance.ORACLE);
+		Instance manageInstanceMySQL = this.initializeInstance(servletContext,
+				ManageInstance.MYSQL);
+		String manageInstanceName = servletContext
+				.getInitParameter(ManageInstance.NAME);
+		ManageInstance.initialize(manageInstanceName, manageInstanceOracle,
+				manageInstanceMySQL);
 	}
 
 	/**

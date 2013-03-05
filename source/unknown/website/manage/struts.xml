@@ -5,7 +5,7 @@
 <struts>
 	<package name="struts-manage" extends="struts-secutiry"
 		namespace="/manage">
-		<action name="maUser!*" class="unknown.website.manage.application.MaUserAction">
+		<action name="user!*" class="unknown.website.manage.application.ManageUserAction">
 			<result name="success">/manage/user/index.jsp</result>
 		</action>
 	</package>

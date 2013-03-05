@@ -1,5 +1,6 @@
 package unknown.website.manage.module;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import unknown.framework.module.pojo.TablePojo;
@@ -119,4 +120,10 @@ public abstract class AbstractManageTable extends TablePojo {
 		this.remark = remark;
 	}
 
+	public String getInsertTimeText() {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss");
+
+		return simpleDateFormat.format(this.getInsertTime());
+	}
 }
