@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import unknown.framework.utility.Trace;
+import unknown.framework.module.database.AbstractSqlBuilder;
+import unknown.framework.module.database.AbstractTypeConverter;
 import unknown.framework.module.database.Instance;
-import unknown.framework.module.database.OperationType;
+import unknown.framework.module.database.OperationTypes;
 import unknown.framework.module.database.Paging;
 import unknown.framework.module.database.Result;
 import unknown.framework.module.database.Row;
@@ -106,20 +107,18 @@ public abstract class AbstractDatabase {
 
 		PreparedStatement preparedStatement = null;
 		results = new ArrayList<Result>();
+		AbstractTypeConverter typeConverter = this.getInstance()
+				.getTypeConverter();
 		AbstractSqlBuilder sqlBuilder = this.getInstance().getSqlBuilder();
 		try {
 			for (int i = 0; i < operations.size(); i++) {
 				Result result = null;
 				Operation operation = operations.get(i);
 				if (operation != null) {
-					int operationType = operation.getOperationType();
+					OperationTypes operationType = operation.getOperationType();
 					Paging paging = operation.getPaging();
-					String sql = null;
-					if (this.getInstance().isCapitalSQL()) {
-						sql = operation.getSql().toUpperCase();
-					} else {
-						sql = operation.getSql().toLowerCase();
-					}
+					String sql = operation.getSql();
+					System.out.println(sql);
 					List<Object> parameters = operation.getParameters();
 
 					preparedStatement = connection.prepareStatement(sql);
@@ -129,27 +128,23 @@ public abstract class AbstractDatabase {
 						while (index < parameters.size()) {
 							Object value = parameters.get(index);
 							index++;
-							Object databaseValue = sqlBuilder.Decode(value);
+							Object databaseValue = typeConverter
+									.database(value);
 							preparedStatement.setObject(index, databaseValue);
 						}
 					}
 
 					switch (operationType) {
-					case OperationType.READ_OPERATION:
+					case Read:
 						if (paging == null) {
 							result = this.executeQuery(preparedStatement);
 						} else {
 							String rowCountSql = sqlBuilder.rowCount(sql);
-							if (this.getInstance().isCapitalSQL()) {
-								rowCountSql = rowCountSql.toUpperCase();
-							} else {
-								rowCountSql = rowCountSql.toLowerCase();
-							}
 							result = this.executePagingQuery(preparedStatement,
 									paging, rowCountSql);
 						}
 						break;
-					case OperationType.WRITE_OPERATION:
+					case Write:
 						result = this.executeUpdate(preparedStatement);
 						break;
 					}

@@ -1,7 +1,7 @@
 package unknown.framework.module.database;
 
 /**
- * 数据库驱动类型
+ * 数据库驱动类型类
  */
 public final class DriverType {
 	/**

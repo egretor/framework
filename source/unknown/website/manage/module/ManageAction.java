@@ -1,46 +1,22 @@
 package unknown.website.manage.module;
 
+import unknown.framework.module.annotation.Remark;
+import unknown.framework.module.annotation.Type;
+import unknown.framework.module.annotation.Types;
+
 /**
  * Action
  */
 public class ManageAction extends AbstractManageTable {
-	private String name;
+	@Type(value = Types.Boolean)
+	@Remark(value = "移除")
 	private boolean remove;
-
-	/**
-	 * 名称
-	 * 
-	 * @return 名称
-	 */
-	public String fgetName() {
-		return name;
-	}
-
-	public void fsetName(String name) {
-		this.name = name;
-	}
 
 	/**
 	 * 移除
 	 * 
 	 * @return 移除
 	 */
-	public boolean fgetRemove() {
-		return remove;
-	}
-
-	public void fsetRemove(boolean remove) {
-		this.remove = remove;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public boolean isRemove() {
 		return remove;
 	}

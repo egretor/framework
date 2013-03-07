@@ -3,11 +3,11 @@ package unknown.framework.module.database;
 import java.util.List;
 
 /**
- * 数据库操作
+ * 数据库操作类
  */
 public class Operation {
 
-	private int operationType;
+	private OperationTypes operationType;
 	private String sql;
 	private List<Object> parameters;
 	private Paging paging;
@@ -17,11 +17,11 @@ public class Operation {
 	 * 
 	 * @return 操作类型
 	 */
-	public int getOperationType() {
+	public OperationTypes getOperationType() {
 		return operationType;
 	}
 
-	public void setOperationType(int operationType) {
+	public void setOperationType(OperationTypes operationType) {
 		this.operationType = operationType;
 	}
 

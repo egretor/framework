@@ -1,14 +1,7 @@
 package unknown.framework.business.database;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 /**
- * 约定
+ * 约定类
  */
 public class Convention {
 	/**
@@ -18,46 +11,19 @@ public class Convention {
 	/**
 	 * 类取值函数前缀
 	 */
-	protected final static String GET_METHOD_PREFIX = "fget";
+	protected final static String GET_METHOD_PREFIX = "get";
 	/**
 	 * 类赋值函数前缀
 	 */
-	protected final static String SET_METHOD_PREFIX = "fset";
-
+	protected final static String SET_METHOD_PREFIX = "set";
 	/**
-	 * 类取值函数缓存
+	 * 类布尔类型取值函数前缀
 	 */
-	protected static Map<String, List<Method>> getMethodCache = new HashMap<String, List<Method>>();
+	protected final static String GET_BOOLEAN_METHOD_PREFIX = "is";
 	/**
-	 * 类赋值函数缓存
+	 * 类布尔类型赋值函数前缀
 	 */
-	protected static Map<String, List<Method>> setMethodCache = new HashMap<String, List<Method>>();
-
-	/**
-	 * UUID
-	 * 
-	 * @return UUID
-	 */
-	public String Uuid() {
-		String result = null;
-
-		String uuid = UUID.randomUUID().toString().toUpperCase();
-		StringBuilder stringBuilder = new StringBuilder();
-		if (uuid != null) {
-			if (!uuid.isEmpty()) {
-				for (int i = 0; i < uuid.length(); i++) {
-					char currentChar = uuid.charAt(i);
-					if (((currentChar >= 'A') && (currentChar <= 'Z'))
-							|| ((currentChar >= '0') && (currentChar <= '9'))) {
-						stringBuilder.append(currentChar);
-					}
-				}
-			}
-		}
-		result = stringBuilder.toString();
-
-		return result;
-	}
+	protected final static String SET_BOOLEAN_METHOD_PREFIX = "set";
 
 	/**
 	 * 数据库标识符编码为编程语言标识符
@@ -104,9 +70,11 @@ public class Convention {
 	 * 
 	 * @param value
 	 *            编程语言标识符
+	 * @param identifierCapital
+	 *            标识符大写
 	 * @return 数据库标识符
 	 */
-	public String decodeName(String value) {
+	public String decodeName(String value, boolean identifierCapital) {
 		String result = null;
 
 		if (value != null) {
@@ -119,7 +87,11 @@ public class Convention {
 					}
 					stringBuilder.append(current);
 				}
-				result = stringBuilder.toString();
+				if (identifierCapital) {
+					result = stringBuilder.toString().toUpperCase();
+				} else {
+					result = stringBuilder.toString().toLowerCase();
+				}
 			}
 		}
 
@@ -190,7 +162,7 @@ public class Convention {
 	}
 
 	/**
-	 * 编码获取方法名称
+	 * 编码取值方法名称
 	 * 
 	 * @param value
 	 *            POJO字段
@@ -201,7 +173,7 @@ public class Convention {
 	}
 
 	/**
-	 * 解码获取方法名称
+	 * 解码取值方法名称
 	 * 
 	 * @param value
 	 *            方法名称
@@ -236,64 +208,52 @@ public class Convention {
 	}
 
 	/**
-	 * 筛选方法
+	 * 编码布尔类型取值方法名称
 	 * 
 	 * @param value
-	 *            实体对象
-	 * @param methodCache
-	 *            方法缓存
-	 * @param methodPrefix
-	 *            方法前缀
-	 * @return 方法集合
+	 *            POJO字段
+	 * @return 方法名称
 	 */
-	protected List<Method> filterMethod(Object value,
-			Map<String, List<Method>> methodCache, String methodPrefix) {
-		List<Method> results = new ArrayList<Method>();
-
-		if (value != null) {
-			String pojoType = value.getClass().getName();
-			if (methodCache.containsKey(pojoType)) {
-				results = methodCache.get(pojoType);
-			} else {
-				Method[] methods = value.getClass().getMethods();
-				if (methods != null) {
-					for (int i = 0; i < methods.length; i++) {
-						Method method = methods[i];
-						String methodName = method.getName();
-
-						if (methodName.indexOf(methodPrefix) == 0) {
-							results.add(method);
-						}
-					}
-				}
-				methodCache.put(pojoType, results);
-			}
-		}
-
-		return results;
+	public String encodeBooleanGetMethodName(String value) {
+		return this.encodeMethodName(value,
+				Convention.GET_BOOLEAN_METHOD_PREFIX);
 	}
 
 	/**
-	 * 筛选取值方法
+	 * 解码布尔类型取值方法名称
 	 * 
 	 * @param value
-	 *            实体对象
-	 * @return 方法集合
+	 *            方法名称
+	 * @return POJO字段
 	 */
-	public List<Method> filterGetMethod(Object value) {
-		return this.filterMethod(value, Convention.getMethodCache,
-				Convention.GET_METHOD_PREFIX);
+	public String decodeBooleanGetMethodName(String value) {
+		return this.decodeMethodName(value,
+				Convention.GET_BOOLEAN_METHOD_PREFIX);
+
 	}
 
 	/**
-	 * 筛选赋值方法
+	 * 编码布尔类型赋值方法名称
 	 * 
 	 * @param value
-	 *            实体对象
-	 * @return 方法集合
+	 *            POJO字段
+	 * @return 方法名称
 	 */
-	public List<Method> filterSetMethod(Object value) {
-		return this.filterMethod(value, Convention.setMethodCache,
-				Convention.SET_METHOD_PREFIX);
+	public String encodeBooleanSetMethodName(String value) {
+		return this.encodeMethodName(value,
+				Convention.SET_BOOLEAN_METHOD_PREFIX);
+
+	}
+
+	/**
+	 * 解码布尔类型赋值方法名称
+	 * 
+	 * @param value
+	 *            方法名称
+	 * @return POJO字段
+	 */
+	public String decodeBooleanSetMethodName(String value) {
+		return this.decodeMethodName(value,
+				Convention.SET_BOOLEAN_METHOD_PREFIX);
 	}
 }

@@ -1,10 +1,18 @@
 package unknown.website.manage.module;
 
+import unknown.framework.module.annotation.Remark;
+import unknown.framework.module.annotation.Type;
+import unknown.framework.module.annotation.Types;
+
 /**
  * 岗位的模块
  */
 public class ManagePostModule extends AbstractManageTable {
+	@Type(value = Types.Uuid)
+	@Remark(value = "岗位编号")
 	private String postId;
+	@Type(value = Types.Uuid)
+	@Remark(value = "模块编号")
 	private String moduleId;
 
 	/**
@@ -12,27 +20,6 @@ public class ManagePostModule extends AbstractManageTable {
 	 * 
 	 * @return 岗位编号
 	 */
-	public String fgetPostId() {
-		return postId;
-	}
-
-	public void fsetPostId(String postId) {
-		this.postId = postId;
-	}
-
-	/**
-	 * 模块编号
-	 * 
-	 * @return 模块编号
-	 */
-	public String fgetModuleId() {
-		return moduleId;
-	}
-
-	public void fsetModuleId(String moduleId) {
-		this.moduleId = moduleId;
-	}
-
 	public String getPostId() {
 		return postId;
 	}
@@ -41,6 +28,11 @@ public class ManagePostModule extends AbstractManageTable {
 		this.postId = postId;
 	}
 
+	/**
+	 * 模块编号
+	 * 
+	 * @return 模块编号
+	 */
 	public String getModuleId() {
 		return moduleId;
 	}

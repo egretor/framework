@@ -1,9 +1,10 @@
-package unknown.framework.business.database;
+package unknown.framework.module.database;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import unknown.framework.module.pojo.AbstractDatabasePojo;
+import unknown.framework.module.pojo.TableMap;
 
 /**
  * SQL生成器
@@ -113,7 +114,7 @@ public abstract class AbstractSqlBuilder {
 	 *            表名称
 	 * @return SQL
 	 */
-	public abstract String queryByUuid(String tableName);
+	public abstract String queryByUuid(String tableName, String uuidField);
 
 	/**
 	 * 新增SQL实现
@@ -122,7 +123,8 @@ public abstract class AbstractSqlBuilder {
 	 *            实体对象
 	 * @return SQL
 	 */
-	protected abstract String insertImplement(AbstractDatabasePojo value);
+	protected abstract String insertImplement(AbstractDatabasePojo value,
+			TableMap tableMap);
 
 	/**
 	 * 修改SQL实现
@@ -131,7 +133,8 @@ public abstract class AbstractSqlBuilder {
 	 *            实体对象
 	 * @return SQL
 	 */
-	protected abstract String updateImplement(AbstractDatabasePojo value);
+	protected abstract String updateImplement(AbstractDatabasePojo value,
+			String uuidField, TableMap tableMap);
 
 	/**
 	 * 新增SQL
@@ -140,13 +143,13 @@ public abstract class AbstractSqlBuilder {
 	 *            实体对象
 	 * @return SQL
 	 */
-	public String insert(AbstractDatabasePojo value) {
+	public String insert(AbstractDatabasePojo value, TableMap tableMap) {
 		String result = null;
 
 		String key = this.cacheKey(value, AbstractSqlBuilder.INSERT_SQL_NAME);
 		result = this.getCache(key);
 		if (result == null) {
-			result = this.insertImplement(value);
+			result = this.insertImplement(value, tableMap);
 			this.setCache(key, result);
 		}
 
@@ -160,13 +163,14 @@ public abstract class AbstractSqlBuilder {
 	 *            实体对象
 	 * @return SQL
 	 */
-	public String update(AbstractDatabasePojo value) {
+	public String update(AbstractDatabasePojo value, String uuidField,
+			TableMap tableMap) {
 		String result = null;
 
 		String key = this.cacheKey(value, AbstractSqlBuilder.UPDATE_SQL_NAME);
 		result = this.getCache(key);
 		if (result == null) {
-			result = this.updateImplement(value);
+			result = this.updateImplement(value, uuidField, tableMap);
 			this.setCache(key, result);
 		}
 
@@ -180,7 +184,7 @@ public abstract class AbstractSqlBuilder {
 	 *            表名称
 	 * @return SQL
 	 */
-	public abstract String delete(String tableName);
+	public abstract String delete(String tableName, String uuidField);
 
 	public abstract Object Encode(Class<?> classType, Object value);
 

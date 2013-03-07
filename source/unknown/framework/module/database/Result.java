@@ -1,7 +1,7 @@
 package unknown.framework.module.database;
 
 /**
- * 执行结果
+ * 执行结果类
  */
 public class Result {
 	private boolean done;

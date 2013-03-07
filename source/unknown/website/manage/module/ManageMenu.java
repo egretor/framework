@@ -1,51 +1,27 @@
 package unknown.website.manage.module;
 
+import unknown.framework.module.annotation.Remark;
+import unknown.framework.module.annotation.Type;
+import unknown.framework.module.annotation.Types;
+
 /**
  * 菜单
  */
 public class ManageMenu extends AbstractManageTable {
+	@Type(value = Types.Uuid)
+	@Remark(value = "分类编号")
 	private String catalogId;
-	private String name;
 
 	/**
 	 * 分类编号
 	 * 
 	 * @return 分类编号
 	 */
-	public String fgetCatalogId() {
-		return catalogId;
-	}
-
-	public void fsetCatalogId(String catalogId) {
-		this.catalogId = catalogId;
-	}
-
-	/**
-	 * 名称
-	 * 
-	 * @return 名称
-	 */
-	public String fgetName() {
-		return name;
-	}
-
-	public void fsetName(String name) {
-		this.name = name;
-	}
-
 	public String getCatalogId() {
 		return catalogId;
 	}
 
 	public void setCatalogId(String catalogId) {
 		this.catalogId = catalogId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 }

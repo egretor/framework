@@ -32,8 +32,8 @@ body {
 	</script>
 	abc123
 	<br />
+	<s:property value="test" />
 	<br />
-	<s:property value="manageUsers.size" />
 
 	<br />999999999999999
 	<br />
@@ -60,6 +60,7 @@ body {
 		<br />
 	</s:iterator>
 	<%
+	/*
 		Package[] ps = Package.getPackages();
 			for (int i = 0; i < ps.length; i++) {
 				if (ps[i].getName().indexOf("unknown.") == 0) {
@@ -93,6 +94,7 @@ body {
 					}
 				}
 			}
+			*/
 	%>
 </body>
 	</html>

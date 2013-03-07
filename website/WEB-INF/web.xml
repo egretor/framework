@@ -10,7 +10,7 @@
 	</context-param>
 	<context-param>
 		<param-name>ManageInstanceName</param-name>
-		<param-value>ManageInstance.MySQL</param-value>
+		<param-value>ManageInstance.Oracle</param-value>
 	</context-param>
 	<context-param>
 		<param-name>ManageInstance.Oracle.Url</param-name>

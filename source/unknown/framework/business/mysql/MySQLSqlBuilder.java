@@ -1,11 +1,11 @@
 package unknown.framework.business.mysql;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
-import unknown.framework.business.database.AbstractSqlBuilder;
-import unknown.framework.business.database.Convention;
+import unknown.framework.module.database.AbstractSqlBuilder;
 import unknown.framework.module.pojo.AbstractDatabasePojo;
+import unknown.framework.module.pojo.FieldMap;
+import unknown.framework.module.pojo.TableMap;
 
 /**
  * MySQL SQL生成器
@@ -45,14 +45,14 @@ public class MySQLSqlBuilder extends AbstractSqlBuilder {
 	}
 
 	@Override
-	public String queryByUuid(String tableName) {
+	public String queryByUuid(String tableName, String uuidField) {
 		String result = null;
 
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("select * from ");
 		stringBuilder.append(tableName);
 		stringBuilder.append(" where ");
-		stringBuilder.append(AbstractDatabasePojo.UUID);
+		stringBuilder.append(uuidField);
 		stringBuilder.append(" = ?");
 
 		result = stringBuilder.toString();
@@ -61,102 +61,91 @@ public class MySQLSqlBuilder extends AbstractSqlBuilder {
 	}
 
 	@Override
-	public String insertImplement(AbstractDatabasePojo value) {
+	public String insertImplement(AbstractDatabasePojo value, TableMap tableMap) {
 		String result = null;
 
-		Convention convention = new Convention();
-		List<Method> properties = convention.filterGetMethod(value);
+		List<FieldMap> fieldMaps = tableMap.getFields();
 
-		if (properties.size() > 0) {
-			StringBuilder fieldStringBuilder = new StringBuilder();
-			StringBuilder parameterStringBuilder = new StringBuilder();
-			int index = 0;
-			for (int i = 0; i < properties.size(); i++) {
-				Method property = properties.get(i);
-				String propertyName = convention.decodeGetMethodName(property
-						.getName());
-				String fieldName = convention.decodeName(propertyName);
+		if (fieldMaps != null)
+			if (fieldMaps.size() > 0) {
+				StringBuilder fieldStringBuilder = new StringBuilder();
+				StringBuilder parameterStringBuilder = new StringBuilder();
+				int index = 0;
+				for (int i = 0; i < fieldMaps.size(); i++) {
+					FieldMap fieldMap = fieldMaps.get(i);
+					String fieldName = fieldMap.getName();
+
+					if (index > 0) {
+						fieldStringBuilder.append(", ");
+						parameterStringBuilder.append(", ");
+					}
+					fieldStringBuilder.append(fieldName);
+					parameterStringBuilder.append("?");
+					index++;
+				}
+
+				String tableName = tableMap.getName();
+
+				StringBuilder stringBuilder = new StringBuilder();
+				stringBuilder.append("insert into ");
+				stringBuilder.append(tableName);
+				stringBuilder.append(" (");
+				stringBuilder.append(fieldStringBuilder.toString());
+				stringBuilder.append(" ) values (");
+				stringBuilder.append(parameterStringBuilder.toString());
+				stringBuilder.append(" )");
+
+				result = stringBuilder.toString();
+			}
+
+		return result;
+	}
+
+	@Override
+	public String updateImplement(AbstractDatabasePojo value, String uuidField, TableMap tableMap) {
+		String result = null;
+
+		List<FieldMap> fieldMaps = tableMap.getOthers();
+
+		StringBuilder fieldStringBuilder = new StringBuilder();
+		int index = 0;
+		for (int i = 0; i < fieldMaps.size(); i++) {
+			FieldMap fieldMap = fieldMaps.get(i);
+			String fieldName = fieldMap.getName();
 
 				if (index > 0) {
 					fieldStringBuilder.append(", ");
-					parameterStringBuilder.append(", ");
 				}
 				fieldStringBuilder.append(fieldName);
-				parameterStringBuilder.append("?");
+				fieldStringBuilder.append(" = ?");
 				index++;
-			}
-
-			String tableName = convention.decodeName(value.getClass()
-					.getSimpleName());
-
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append("insert into ");
-			stringBuilder.append(tableName);
-			stringBuilder.append(" (");
-			stringBuilder.append(fieldStringBuilder.toString());
-			stringBuilder.append(" ) values (");
-			stringBuilder.append(parameterStringBuilder.toString());
-			stringBuilder.append(" )");
-
-			result = stringBuilder.toString();
 		}
+
+		String tableName = tableMap.getName();
+
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("update ");
+		stringBuilder.append(tableName);
+		stringBuilder.append(" set ");
+		stringBuilder.append(fieldStringBuilder.toString());
+		stringBuilder.append(" where ");
+		stringBuilder.append(uuidField);
+		stringBuilder.append(" = ?");
+
+		result = stringBuilder.toString();
 
 		return result;
 	}
 
 	@Override
-	public String updateImplement(AbstractDatabasePojo value) {
-		String result = null;
-
-		Convention convention = new Convention();
-		List<Method> properties = convention.filterGetMethod(value);
-
-		if (properties.size() > 0) {
-			StringBuilder fieldStringBuilder = new StringBuilder();
-			int index = 0;
-			for (int i = 0; i < properties.size(); i++) {
-				Method property = properties.get(i);
-				String propertyName = convention.decodeGetMethodName(property
-						.getName());
-				String fieldName = convention.decodeName(propertyName);
-
-				if (!AbstractDatabasePojo.UUID.equalsIgnoreCase(fieldName)) {
-					if (index > 0) {
-						fieldStringBuilder.append(", ");
-					}
-					fieldStringBuilder.append(fieldName);
-					fieldStringBuilder.append(" = ?");
-					index++;
-				}
-			}
-
-			String tableName = convention.decodeName(value.getClass()
-					.getSimpleName());
-
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append("update ");
-			stringBuilder.append(tableName);
-			stringBuilder.append(" set ");
-			stringBuilder.append(fieldStringBuilder.toString());
-			stringBuilder.append(" where ");
-			stringBuilder.append(AbstractDatabasePojo.UUID);
-			stringBuilder.append(" = ?");
-
-			result = stringBuilder.toString();
-		}
-
-		return result;
-	}
-
-	@Override
-	public String delete(String tableName) {
+	public String delete(String tableName, String uuidField) {
 		String result = null;
 
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("delete from ");
 		stringBuilder.append(tableName);
 		stringBuilder.append(" where ");
-		stringBuilder.append(AbstractDatabasePojo.UUID);
+		stringBuilder.append(uuidField);
 		stringBuilder.append(" = ?");
 
 		result = stringBuilder.toString();

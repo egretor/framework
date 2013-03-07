@@ -1,7 +1,7 @@
 package unknown.framework.module.database;
 
 /**
- * 分页
+ * 分页类
  */
 public class Paging {
 	/**
@@ -20,36 +20,6 @@ public class Paging {
 	private int currentPage = Paging.MINIMUM_PAGE;
 	private int rowsPerPage = Paging.MAXIMUM_ROWS_PER_PAGE;
 	private int rowCount = 0;
-
-	/**
-	 * 当前页第一行
-	 * 
-	 * @return 当前页第一行
-	 */
-	public int getCurrentPageFirstRow() {
-		int result = 1;
-
-		result = ((currentPage - 1) * rowsPerPage) + 1;
-
-		return result;
-	}
-
-	/**
-	 * 总页数
-	 * 
-	 * @return 总页数
-	 */
-	public int getPageCount() {
-		int result = 1;
-
-		result = this.rowCount / this.rowsPerPage;
-		int remainder = this.rowCount % this.rowsPerPage;
-		if (remainder > 0) {
-			result++;
-		}
-
-		return result;
-	}
 
 	/**
 	 * 当前页
@@ -94,4 +64,33 @@ public class Paging {
 		this.rowCount = rowCount;
 	}
 
+	/**
+	 * 当前页第一行
+	 * 
+	 * @return 当前页第一行
+	 */
+	public int getCurrentPageFirstRow() {
+		int result = 1;
+
+		result = ((currentPage - 1) * rowsPerPage) + 1;
+
+		return result;
+	}
+
+	/**
+	 * 总页数
+	 * 
+	 * @return 总页数
+	 */
+	public int getPageCount() {
+		int result = 1;
+
+		result = this.rowCount / this.rowsPerPage;
+		int remainder = this.rowCount % this.rowsPerPage;
+		if (remainder > 0) {
+			result++;
+		}
+
+		return result;
+	}
 }

@@ -1,8 +1,11 @@
 package unknown.website;
 
 import unknown.framework.business.mysql.MySQLSqlBuilder;
+import unknown.framework.business.mysql.MySQLTypeConverter;
 import unknown.framework.business.oracle.OracleSqlBuilder;
+import unknown.framework.business.oracle.OracleTypeConverter;
 import unknown.framework.module.database.Instance;
+import unknown.website.manage.business.ManageUserBusiness;
 
 /**
  * 管理实例
@@ -28,12 +31,17 @@ public final class ManageInstance {
 	}
 
 	private static void initializeOracle() {
-		ManageInstance.instance.setCapitalSQL(true);
+		ManageInstance.instance.setIdentifierCapital(true);
+		ManageInstance.instance.setTypeConverter(new OracleTypeConverter());
 		ManageInstance.instance.setSqlBuilder(new OracleSqlBuilder());
+
+		ManageInstance.instance.setSql(ManageUserBusiness.QUERY_BY_ACCOUNT,
+				"select * from MANAGE_USER where ACCOUNT = ?");
 	}
 
 	private static void initializeMySQL() {
-		ManageInstance.instance.setCapitalSQL(false);
+		ManageInstance.instance.setIdentifierCapital(false);
+		ManageInstance.instance.setTypeConverter(new MySQLTypeConverter());
 		ManageInstance.instance.setSqlBuilder(new MySQLSqlBuilder());
 	}
 

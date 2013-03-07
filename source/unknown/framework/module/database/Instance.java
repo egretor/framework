@@ -3,17 +3,17 @@ package unknown.framework.module.database;
 import java.util.HashMap;
 import java.util.Map;
 
-import unknown.framework.business.database.AbstractSqlBuilder;
 
 /**
- * 数据库实例
+ * 数据库实例类
  */
 public class Instance {
 	private String name;
 	private String url;
 	private String user;
 	private String password;
-	private boolean capitalSQL;
+	private boolean identifierCapital;
+	private AbstractTypeConverter typeConverter;
 	private AbstractSqlBuilder sqlBuilder;
 	private Map<String, String> sqls = new HashMap<String, String>();
 
@@ -70,16 +70,29 @@ public class Instance {
 	}
 
 	/**
-	 * SQL大写
+	 * 标识符大写
 	 * 
 	 * @return 是否
 	 */
-	public boolean isCapitalSQL() {
-		return capitalSQL;
+	public boolean isIdentifierCapital() {
+		return identifierCapital;
 	}
 
-	public void setCapitalSQL(boolean capitalSQL) {
-		this.capitalSQL = capitalSQL;
+	public void setIdentifierCapital(boolean identifierCapital) {
+		this.identifierCapital = identifierCapital;
+	}
+
+	/**
+	 * 类型转换器
+	 * 
+	 * @return 类型转换器
+	 */
+	public AbstractTypeConverter getTypeConverter() {
+		return typeConverter;
+	}
+
+	public void setTypeConverter(AbstractTypeConverter typeConverter) {
+		this.typeConverter = typeConverter;
 	}
 
 	/**

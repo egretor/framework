@@ -1,46 +1,24 @@
 package unknown.framework.module.pojo;
 
+import unknown.framework.module.annotation.Remark;
+import unknown.framework.module.annotation.Type;
+import unknown.framework.module.annotation.Types;
+
 /**
- * 数据库实体
- * 
- * 值 空值 MySQL Oracle 备注
- * 
- * boolean Boolean BIT NUMBER(1)
- * 
- * int Integer INT NUMBER(16)
- * 
- * long Long BIGINT NUMBER(32)
- * 
- * double Double DOUBLE NUMBER(29,9)
- * 
- * String String TEXT VARCHAR(4000)
- * 
- * String String VARCHAR(32) VARCHAR(32) UUID
- * 
- * String String LONGTEXT CLOB
- * 
- * Date Date DATETIME TIMESTAMP
+ * 数据库实体抽象类
  */
 public abstract class AbstractDatabasePojo {
-	/**
-	 * UUID
-	 */
 	public final static String UUID = "uuid";
 
-	private String uuid;
+	@Type(value = Types.Uuid, major = true)
+	@Remark(value = "编号")
+	protected String uuid;
 
 	/**
+	 * 编号
 	 * 
-	 * @return 代理主键
+	 * @return 编号
 	 */
-	public String fgetUuid() {
-		return uuid;
-	}
-
-	public void fsetUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
 	public String getUuid() {
 		return uuid;
 	}

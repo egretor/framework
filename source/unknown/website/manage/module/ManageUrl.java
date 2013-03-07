@@ -1,11 +1,18 @@
 package unknown.website.manage.module;
 
+import unknown.framework.module.annotation.Remark;
+import unknown.framework.module.annotation.Type;
+import unknown.framework.module.annotation.Types;
+
 /**
  * Url
  */
 public class ManageUrl extends AbstractManageTable {
+	@Type(value = Types.Uuid)
+	@Remark(value = "菜单编号")
 	private String menuId;
-	private String name;
+	@Type(value = Types.String)
+	@Remark(value = "值")
 	private String value;
 
 	/**
@@ -13,40 +20,6 @@ public class ManageUrl extends AbstractManageTable {
 	 * 
 	 * @return 菜单编号
 	 */
-	public String fgetMenuId() {
-		return menuId;
-	}
-
-	public void fsetMenuId(String menuId) {
-		this.menuId = menuId;
-	}
-
-	/**
-	 * 名称
-	 * 
-	 * @return 名称
-	 */
-	public String fgetName() {
-		return name;
-	}
-
-	public void fsetName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * 值
-	 * 
-	 * @return 值
-	 */
-	public String fgetValue() {
-		return value;
-	}
-
-	public void fsetValue(String value) {
-		this.value = value;
-	}
-
 	public String getMenuId() {
 		return menuId;
 	}
@@ -55,14 +28,11 @@ public class ManageUrl extends AbstractManageTable {
 		this.menuId = menuId;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
+	/**
+	 * 值
+	 * 
+	 * @return 值
+	 */
 	public String getValue() {
 		return value;
 	}

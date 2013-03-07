@@ -3,7 +3,7 @@ package unknown.framework.module.database;
 import java.util.List;
 
 /**
- * 数据库行数据
+ * 数据库行数据类
  */
 public class Row {
 	private List<Object> values;

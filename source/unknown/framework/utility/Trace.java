@@ -3,7 +3,7 @@ package unknown.framework.utility;
 import org.apache.log4j.Logger;
 
 /**
- * 跟踪
+ * 跟踪类
  */
 public class Trace {
 	/**
