@@ -4,15 +4,19 @@ package unknown.framework.module.database;
  * 执行结果类
  */
 public class Result {
-	private boolean done;
-	private Table table;
-	private Paging paging;
-
 	/**
 	 * 成败
-	 * 
-	 * @return 成败
 	 */
+	private boolean done;
+	/**
+	 * 表
+	 */
+	private Table table;
+	/**
+	 * 分页器
+	 */
+	private Paging paging;
+
 	public boolean isDone() {
 		return done;
 	}
@@ -21,11 +25,6 @@ public class Result {
 		this.done = done;
 	}
 
-	/**
-	 * 表数据
-	 * 
-	 * @return 表数据
-	 */
 	public Table getTable() {
 		return table;
 	}
@@ -34,11 +33,6 @@ public class Result {
 		this.table = table;
 	}
 
-	/**
-	 * 分页
-	 * 
-	 * @return 分页
-	 */
 	public Paging getPaging() {
 		return paging;
 	}

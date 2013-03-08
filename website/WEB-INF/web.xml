@@ -4,38 +4,45 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	id="Framework" version="3.0">
 	<display-name>Framework</display-name>
+	<!-- 网站目录键 -->
 	<context-param>
 		<param-name>WebsiteDirectoryKey</param-name>
 		<param-value>website.directory</param-value>
 	</context-param>
+	<!-- 数据库参数 -->
 	<context-param>
-		<param-name>ManageInstanceName</param-name>
-		<param-value>ManageInstance.Oracle</param-value>
+		<param-name>WebsiteInstance</param-name>
+		<param-value>WebsiteInstance</param-value>
 	</context-param>
 	<context-param>
-		<param-name>ManageInstance.Oracle.Url</param-name>
+		<param-name>WebsiteInstance.Driver</param-name>
+		<param-value>oracle.jdbc.driver.OracleDriver</param-value>
+	</context-param>
+	<context-param>
+		<param-name>WebsiteInstance.Url</param-name>
 		<param-value>jdbc:oracle:thin:@localhost:1521:r8a092e</param-value>
 	</context-param>
 	<context-param>
-		<param-name>ManageInstance.Oracle.User</param-name>
+		<param-name>WebsiteInstance.User</param-name>
 		<param-value>framework</param-value>
 	</context-param>
 	<context-param>
-		<param-name>ManageInstance.Oracle.Password</param-name>
+		<param-name>WebsiteInstance.Password</param-name>
 		<param-value>password</param-value>
 	</context-param>
 	<context-param>
-		<param-name>ManageInstance.MySQL.Url</param-name>
-		<param-value>jdbc:mysql://localhost:3306/framework</param-value>
+		<param-name>WebsiteInstance.IdentifierCapital</param-name>
+		<param-value>true</param-value>
 	</context-param>
 	<context-param>
-		<param-name>ManageInstance.MySQL.User</param-name>
-		<param-value>framework</param-value>
+		<param-name>WebsiteInstance.TypeConverter</param-name>
+		<param-value>unknown.framework.business.oracle.OracleTypeConverter</param-value>
 	</context-param>
 	<context-param>
-		<param-name>ManageInstance.MySQL.Password</param-name>
-		<param-value>password</param-value>
+		<param-name>WebsiteInstance.SqlBuilder</param-name>
+		<param-value>unknown.framework.business.oracle.OracleSqlBuilder</param-value>
 	</context-param>
+	<!-- 自定义监听器 -->
 	<listener>
 		<listener-class>unknown.website.listener.ContextListener</listener-class>
 	</listener>
@@ -45,6 +52,7 @@
 	<listener>
 		<listener-class>unknown.website.listener.RequestListener</listener-class>
 	</listener>
+	<!-- Struts2筛选器 -->
 	<filter>
 		<filter-name>struts2</filter-name>
 		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>

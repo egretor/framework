@@ -3,39 +3,45 @@ package unknown.website.manage.module;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import unknown.framework.module.annotation.Remark;
 import unknown.framework.module.annotation.Type;
 import unknown.framework.module.annotation.Types;
-import unknown.framework.module.pojo.TablePojo;
+import unknown.framework.module.pojo.AbstractDatabasePojo;
 
 /**
  * 管理模块表
  */
-public abstract class AbstractManageTable extends TablePojo {
-	@Type(value = Types.Uuid)
-	@Remark(value = "新增操作用户编号")
+public abstract class AbstractManage extends AbstractDatabasePojo {
+	/**
+	 * 新增操作用户编号
+	 */
+	@Type(value = Types.UUID)
 	protected String insertUserId;
-	@Type(value = Types.Date)
-	@Remark(value = "新增操作时间")
+	/**
+	 * 新增操作时间
+	 */
+	@Type(value = Types.DATE)
 	protected Date insertTime;
-	@Type(value = Types.Uuid)
-	@Remark(value = "修改操作用户编号")
+	/**
+	 * 更新操作用户编号
+	 */
+	@Type(value = Types.UUID)
 	protected String updateUserId;
-	@Type(value = Types.Date)
-	@Remark(value = "修改操作时间")
+	/**
+	 * 更新操作时间
+	 */
+	@Type(value = Types.DATE)
 	protected Date updateTime;
-	@Type(value = Types.Text)
-	@Remark(value = "备注")
+	/**
+	 * 备注
+	 */
+	@Type(value = Types.TEXT)
 	protected String remark;
-	@Type(value = Types.String)
-	@Remark(value = "名称")
+	/**
+	 * 名称
+	 */
+	@Type(value = Types.STRING)
 	protected String name;
 
-	/**
-	 * 执行新增操作用户编号
-	 * 
-	 * @return 执行新增操作用户编号
-	 */
 	public String getInsertUserId() {
 		return insertUserId;
 	}
@@ -44,11 +50,6 @@ public abstract class AbstractManageTable extends TablePojo {
 		this.insertUserId = insertUserId;
 	}
 
-	/**
-	 * 新增时间
-	 * 
-	 * @return 新增时间
-	 */
 	public Date getInsertTime() {
 		return insertTime;
 	}
@@ -57,11 +58,6 @@ public abstract class AbstractManageTable extends TablePojo {
 		this.insertTime = insertTime;
 	}
 
-	/**
-	 * 执行更新操作用户编号
-	 * 
-	 * @return 执行更新操作用户编号
-	 */
 	public String getUpdateUserId() {
 		return updateUserId;
 	}
@@ -70,11 +66,6 @@ public abstract class AbstractManageTable extends TablePojo {
 		this.updateUserId = updateUserId;
 	}
 
-	/**
-	 * 更新时间
-	 * 
-	 * @return 更新时间
-	 */
 	public Date getUpdateTime() {
 		return updateTime;
 	}
@@ -83,11 +74,6 @@ public abstract class AbstractManageTable extends TablePojo {
 		this.updateTime = updateTime;
 	}
 
-	/**
-	 * 备注
-	 * 
-	 * @return 备注
-	 */
 	public String getRemark() {
 		return remark;
 	}
@@ -96,11 +82,6 @@ public abstract class AbstractManageTable extends TablePojo {
 		this.remark = remark;
 	}
 
-	/**
-	 * 名称
-	 * 
-	 * @return 名称
-	 */
 	public String getName() {
 		return name;
 	}
@@ -109,10 +90,27 @@ public abstract class AbstractManageTable extends TablePojo {
 		this.name = name;
 	}
 
+	/**
+	 * 新增操作时间
+	 * 
+	 * @return 新增操作时间
+	 */
 	public String getInsertTimeText() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
 				"yyyy-MM-dd HH:mm:ss");
 
 		return simpleDateFormat.format(this.getInsertTime());
+	}
+
+	/**
+	 * 修改操作时间
+	 * 
+	 * @return 修改操作时间
+	 */
+	public String getUpdateTimeText() {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss");
+
+		return simpleDateFormat.format(this.getUpdateTime());
 	}
 }

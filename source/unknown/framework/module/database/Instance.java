@@ -1,40 +1,46 @@
 package unknown.framework.module.database;
 
-import java.util.HashMap;
-import java.util.Map;
-
-
 /**
  * 数据库实例类
  */
 public class Instance {
-	private String name;
+	/**
+	 * 驱动类
+	 */
+	private String driver;
+	/**
+	 * 链接URL
+	 */
 	private String url;
+	/**
+	 * 用户
+	 */
 	private String user;
+	/**
+	 * 密码
+	 */
 	private String password;
+	/**
+	 * 标识符大写
+	 */
 	private boolean identifierCapital;
+	/**
+	 * 类型转换器
+	 */
 	private AbstractTypeConverter typeConverter;
+	/**
+	 * SQL语句生成器
+	 */
 	private AbstractSqlBuilder sqlBuilder;
-	private Map<String, String> sqls = new HashMap<String, String>();
 
-	/**
-	 * 名称
-	 * 
-	 * @return 名称
-	 */
-	public String getName() {
-		return name;
+	public String getDriver() {
+		return driver;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setDriver(String driver) {
+		this.driver = driver;
 	}
 
-	/**
-	 * 连接Url
-	 * 
-	 * @return 连接Url
-	 */
 	public String getUrl() {
 		return url;
 	}
@@ -43,11 +49,6 @@ public class Instance {
 		this.url = url;
 	}
 
-	/**
-	 * 用户
-	 * 
-	 * @return 用户
-	 */
 	public String getUser() {
 		return user;
 	}
@@ -56,11 +57,6 @@ public class Instance {
 		this.user = user;
 	}
 
-	/**
-	 * 密码
-	 * 
-	 * @return 密码
-	 */
 	public String getPassword() {
 		return password;
 	}
@@ -69,11 +65,6 @@ public class Instance {
 		this.password = password;
 	}
 
-	/**
-	 * 标识符大写
-	 * 
-	 * @return 是否
-	 */
 	public boolean isIdentifierCapital() {
 		return identifierCapital;
 	}
@@ -82,11 +73,6 @@ public class Instance {
 		this.identifierCapital = identifierCapital;
 	}
 
-	/**
-	 * 类型转换器
-	 * 
-	 * @return 类型转换器
-	 */
 	public AbstractTypeConverter getTypeConverter() {
 		return typeConverter;
 	}
@@ -95,48 +81,11 @@ public class Instance {
 		this.typeConverter = typeConverter;
 	}
 
-	/**
-	 * SQL生成器
-	 * 
-	 * @return SQL生成器
-	 */
 	public AbstractSqlBuilder getSqlBuilder() {
 		return sqlBuilder;
 	}
 
 	public void setSqlBuilder(AbstractSqlBuilder sqlBuilder) {
 		this.sqlBuilder = sqlBuilder;
-	}
-
-	/**
-	 * 获取SQL
-	 * 
-	 * @param key
-	 *            键
-	 * @return SQL
-	 */
-	public String getSql(String key) {
-		String result = null;
-
-		if (this.sqls.containsKey(key)) {
-			result = this.sqls.get(key);
-		}
-
-		return result;
-	}
-
-	/**
-	 * 赋值SQL
-	 * 
-	 * @param key
-	 *            键
-	 * @param sql
-	 *            SQL
-	 */
-	public void setSql(String key, String sql) {
-		if (this.sqls.containsKey(key)) {
-			this.sqls.remove(key);
-		}
-		this.sqls.put(key, sql);
 	}
 }

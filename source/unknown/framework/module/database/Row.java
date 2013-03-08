@@ -6,12 +6,11 @@ import java.util.List;
  * 数据库行数据类
  */
 public class Row {
-	private List<Object> values;
-
 	/**
 	 * 数据集合
-	 * @return 数据集合
 	 */
+	private List<Object> values;
+
 	public List<Object> getValues() {
 		return values;
 	}

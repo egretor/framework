@@ -6,6 +6,9 @@ import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
 
+/**
+ * 安全拦截器
+ */
 public class SecurityInterceptor extends AbstractInterceptor {
 
 	/**

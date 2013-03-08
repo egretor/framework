@@ -1,24 +1,30 @@
-package unknown.framework.module.pojo;
+package unknown.framework.module.database;
 
 import java.lang.reflect.Method;
 
 import unknown.framework.module.annotation.Types;
 
 /**
- * 字段映射类
+ * 数据库字段映射类
  */
 public class FieldMap {
-	private String name;
-	private Types type;
-	private String remark;
-	private Method getter;
-	private Method setter;
-
 	/**
 	 * 名称
-	 * 
-	 * @return 名称
 	 */
+	private String name;
+	/**
+	 * 注解类型
+	 */
+	private Types type;
+	/**
+	 * 取值器
+	 */
+	private Method getter;
+	/**
+	 * 赋值器
+	 */
+	private Method setter;
+
 	public String getName() {
 		return name;
 	}
@@ -27,11 +33,6 @@ public class FieldMap {
 		this.name = name;
 	}
 
-	/**
-	 * 类型
-	 * 
-	 * @return 类型
-	 */
 	public Types getType() {
 		return type;
 	}
@@ -40,24 +41,6 @@ public class FieldMap {
 		this.type = type;
 	}
 
-	/**
-	 * 备注
-	 * 
-	 * @return 备注
-	 */
-	public String getRemark() {
-		return remark;
-	}
-
-	public void setRemark(String remark) {
-		this.remark = remark;
-	}
-
-	/**
-	 * 取值器
-	 * 
-	 * @return 取值器
-	 */
 	public Method getGetter() {
 		return getter;
 	}
@@ -66,11 +49,6 @@ public class FieldMap {
 		this.getter = getter;
 	}
 
-	/**
-	 * 赋值器
-	 * 
-	 * @return 赋值器
-	 */
 	public Method getSetter() {
 		return setter;
 	}

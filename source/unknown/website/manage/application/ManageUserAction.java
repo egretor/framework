@@ -1,13 +1,17 @@
 package unknown.website.manage.application;
 
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.struts2.json.annotations.JSON;
 
 import unknown.website.AbstractAction;
 import unknown.website.manage.business.ManageUserBusiness;
 import unknown.website.manage.module.ManageUser;
 
 import com.opensymphony.xwork2.ActionSupport;
+import com.opensymphony.xwork2.inject.Factory;
 
 public class ManageUserAction extends AbstractAction {
 
@@ -21,9 +25,13 @@ public class ManageUserAction extends AbstractAction {
 	private String test;
 
 	public String list() {
+
+		Map<String, String> abc = new HashMap<String, String>();
+		abc.put("abc", "123");
+		abc.put("abc", "456");
+
 		ManageUserBusiness bs = new ManageUserBusiness();
 
-		Date now = new Date();
 		ManageUser user = bs.query("E2C773DE1E1B4554B524DAA66B20360B");
 		/*
 		 * user.setUuid(bs.getUuid()); user.setInsertUserId(user.getUuid());
@@ -37,12 +45,13 @@ public class ManageUserAction extends AbstractAction {
 		 */
 
 		user.setAccount("testsdflsk");
-		this.test = bs.update(user).toString();
+		this.test = bs.update(user).getType().toString();
 
 		this.manageUsers = bs.query();
-		return ActionSupport.SUCCESS;
+		return "json";
 	}
 
+	@JSON(serialize = false)
 	public List<ManageUser> getManageUsers() {
 		return manageUsers;
 	}

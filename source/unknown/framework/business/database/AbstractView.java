@@ -9,31 +9,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import unknown.framework.module.annotation.Remark;
 import unknown.framework.module.annotation.Type;
 import unknown.framework.module.database.AbstractSqlBuilder;
 import unknown.framework.module.database.AbstractTypeConverter;
+import unknown.framework.module.database.FieldMap;
 import unknown.framework.module.database.OperationTypes;
 import unknown.framework.module.database.Paging;
 import unknown.framework.module.database.Result;
 import unknown.framework.module.database.Row;
 import unknown.framework.module.database.Table;
 import unknown.framework.module.database.Operation;
+import unknown.framework.module.database.TableMap;
 import unknown.framework.module.pojo.AbstractDatabasePojo;
-import unknown.framework.module.pojo.FieldMap;
-import unknown.framework.module.pojo.TableMap;
-import unknown.framework.module.pojo.ViewPojo;
 import unknown.framework.utility.Trace;
 
 /**
- * 视图
+ * 视图类
  * 
  * @param <T>
- *            数据库视图实体
+ *            数据库实体
  */
-public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase {
-
-	protected final static Map<String, TableMap> tableMapCache = new HashMap<String, TableMap>();
+public abstract class AbstractView<T extends AbstractDatabasePojo> extends
+		AbstractDatabase {
+	/**
+	 * 表映射集合
+	 */
+	protected final static Map<String, TableMap> TABLEMAP = new HashMap<String, TableMap>();
 
 	/**
 	 * 
@@ -42,26 +43,32 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 	public abstract T initializePojo();
 
 	/**
-	 * UUID
+	 * 获取UUID值
 	 * 
-	 * @return UUID
+	 * @return UUID值
 	 */
 	public String getUuid() {
 		String result = null;
 
 		String uuid = UUID.randomUUID().toString().toUpperCase();
+
 		StringBuilder stringBuilder = new StringBuilder();
+
 		if (uuid != null) {
 			if (!uuid.isEmpty()) {
 				for (int i = 0; i < uuid.length(); i++) {
 					char currentChar = uuid.charAt(i);
-					if (((currentChar >= 'A') && (currentChar <= 'Z'))
-							|| ((currentChar >= '0') && (currentChar <= '9'))) {
+					boolean isChar = (currentChar >= 'A')
+							&& (currentChar <= 'Z');
+					boolean isNumber = (currentChar >= '0')
+							&& (currentChar <= '9');
+					if (isChar || isNumber) {
 						stringBuilder.append(currentChar);
 					}
 				}
 			}
 		}
+
 		result = stringBuilder.toString();
 
 		return result;
@@ -75,49 +82,61 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 	public TableMap getTableMap() {
 		TableMap result = null;
 
+		AbstractSqlBuilder sqlBuilder = this.getInstance().getSqlBuilder();
 		Convention convention = new Convention();
 		boolean identifierCapital = this.getInstance().isIdentifierCapital();
 		T value = this.initializePojo();
 		Class<?> classType = value.getClass();
 		String key = classType.getName();
-		if (AbstractView.tableMapCache.containsKey(key)) {
-			result = AbstractView.tableMapCache.get(key);
+
+		if (AbstractView.TABLEMAP.containsKey(key)) {
+			result = AbstractView.TABLEMAP.get(key);
 		} else {
+			result = new TableMap();
+
 			String name = convention.decodeName(classType.getSimpleName(),
 					identifierCapital);
 			FieldMap major = new FieldMap();
 			List<FieldMap> others = new ArrayList<FieldMap>();
-			List<FieldMap> fields = new ArrayList<FieldMap>();
+			List<FieldMap> fieldMaps = new ArrayList<FieldMap>();
 
-			List<Field> allFields = new ArrayList<Field>();
+			String sql = sqlBuilder.getSql(key, key);
+			if (sql != null) {
+				if (!sql.isEmpty()) {
+					name = sql;
+				}
+			}
 
+			List<Field> fields = new ArrayList<Field>();
 			Class<?> supperclassType = classType;
 			do {
 				Field[] declaredFields = supperclassType.getDeclaredFields();
 				if (declaredFields != null) {
 					for (int i = 0; i < declaredFields.length; i++) {
-						allFields.add(declaredFields[i]);
+						fields.add(declaredFields[i]);
 					}
 				}
 				supperclassType = supperclassType.getSuperclass();
 			} while (!supperclassType.equals(Object.class));
 
-			for (int i = 0; i < allFields.size(); i++) {
-				Field field = allFields.get(i);
+			for (int i = 0; i < fields.size(); i++) {
+				Field field = fields.get(i);
 				Type type = field.getAnnotation(Type.class);
-				Remark remark = field.getAnnotation(Remark.class);
 				if (type != null) {
+					FieldMap fieldMap = new FieldMap();
+
 					String fieldName = field.getName();
+					Class<?> parameterType = field.getType();
+
 					String filedMapName = convention.decodeName(fieldName,
 							identifierCapital);
 					String getterName = null;
 					String setterName = null;
 					Method getter = null;
 					Method setter = null;
-					Class<?> parameterType = field.getType();
 
 					switch (type.value()) {
-					case Boolean:
+					case BOOLEAN:
 						getterName = convention
 								.encodeBooleanGetMethodName(fieldName);
 						setterName = convention
@@ -133,15 +152,13 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 						getter = classType.getMethod(getterName);
 						setter = classType.getMethod(setterName, parameterType);
 					} catch (SecurityException e) {
-						e.printStackTrace();
+						Trace.getFramework().error(e);
 					} catch (NoSuchMethodException e) {
-						e.printStackTrace();
+						Trace.getFramework().error(e);
 					}
 
-					FieldMap fieldMap = new FieldMap();
 					fieldMap.setName(filedMapName);
 					fieldMap.setType(type.value());
-					fieldMap.setRemark(remark.value());
 					fieldMap.setGetter(getter);
 					fieldMap.setSetter(setter);
 
@@ -150,23 +167,17 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 					} else {
 						others.add(fieldMap);
 					}
-					fields.add(fieldMap);
+
+					fieldMaps.add(fieldMap);
 				}
 			}
 
-			String sql = this.getInstance().getSql(key);
-			if (sql != null) {
-				if (!sql.isEmpty()) {
-					name = sql;
-				}
-			}
-
-			result = new TableMap();
 			result.setName(name);
 			result.setMajor(major);
 			result.setOthers(others);
-			result.setFields(fields);
-			AbstractView.tableMapCache.put(key, result);
+			result.setFieldMaps(fieldMaps);
+
+			AbstractView.TABLEMAP.put(key, result);
 		}
 
 		return result;
@@ -181,7 +192,7 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 	 *            行数据
 	 * @return 实体对象
 	 */
-	protected T Parse(List<String> fields, Row row) {
+	protected T parse(List<String> fields, Row row) {
 		T result = this.initializePojo();
 
 		AbstractTypeConverter typeConverter = this.getInstance()
@@ -190,28 +201,27 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 		List<Object> values = row.getValues();
 
 		TableMap tableMap = this.getTableMap();
-		List<FieldMap> fieldMaps = tableMap.getFields();
+		List<FieldMap> fieldMaps = tableMap.getFieldMaps();
+		for (int i = 0; i < fields.size(); i++) {
+			Object column = values.get(i);
+			String field = fields.get(i);
 
-		if (fieldMaps != null) {
-			for (int j = 0; j < fields.size(); j++) {
-				Object column = values.get(j);
-				String field = fields.get(j);
-				for (int k = 0; k < fieldMaps.size(); k++) {
-					FieldMap fieldMap = fieldMaps.get(k);
-					if (field.equalsIgnoreCase(fieldMap.getName())) {
-						try {
-							Method method = fieldMap.getSetter();
-							Object value = typeConverter.java(fieldMap, column);
-							method.invoke(result, value);
-						} catch (IllegalArgumentException e) {
-							Trace.logger().error(e);
-						} catch (IllegalAccessException e) {
-							Trace.logger().error(e);
-						} catch (InvocationTargetException e) {
-							Trace.logger().error(e);
-						}
-						break;
+			for (int j = 0; j < fieldMaps.size(); j++) {
+				FieldMap fieldMap = fieldMaps.get(j);
+
+				if (field.equalsIgnoreCase(fieldMap.getName())) {
+					try {
+						Method method = fieldMap.getSetter();
+						Object value = typeConverter.getJava(fieldMap, column);
+						method.invoke(result, value);
+					} catch (IllegalArgumentException e) {
+						Trace.getFramework().error(e);
+					} catch (IllegalAccessException e) {
+						Trace.getFramework().error(e);
+					} catch (InvocationTargetException e) {
+						Trace.getFramework().error(e);
 					}
+					break;
 				}
 			}
 		}
@@ -226,20 +236,20 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 	 *            表数据
 	 * @return 实体对象集合
 	 */
-	protected List<T> Parse(Table table) {
+	protected List<T> parse(Table table) {
 		List<T> results = null;
 
 		if (table != null) {
 			List<String> fields = table.getFields();
 			List<Row> rows = table.getRows();
-			if ((fields != null) && (fields.size() > 0)) {
-				if (rows != null) {
-					results = new ArrayList<T>();
-					for (int i = 0; i < rows.size(); i++) {
-						Row row = rows.get(i);
-						T currentValue = this.Parse(fields, row);
-						results.add(currentValue);
-					}
+
+			if (rows != null) {
+				results = new ArrayList<T>();
+
+				for (int i = 0; i < rows.size(); i++) {
+					Row row = rows.get(i);
+					T currentValue = this.parse(fields, row);
+					results.add(currentValue);
 				}
 			}
 		}
@@ -265,7 +275,7 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 	 * 分页查询
 	 * 
 	 * @param paging
-	 *            分页
+	 *            分页器
 	 * @return 实体对象集合
 	 */
 	public List<T> query(Paging paging) {
@@ -273,25 +283,23 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 
 		T value = this.initializePojo();
 		if (value != null) {
+			AbstractSqlBuilder sqlBuilder = this.getInstance().getSqlBuilder();
+
 			TableMap tableMap = this.getTableMap();
 			String tableName = tableMap.getName();
-
-			AbstractSqlBuilder sqlBuilder = this.getInstance().getSqlBuilder();
-			String sql = sqlBuilder.query(tableName);
-
-			List<Object> parameters = new ArrayList<Object>();
+			String sql = sqlBuilder.getQuerySql(tableName);
 
 			Operation operation = new Operation();
-			operation.setOperationType(OperationTypes.Read);
+			operation.setType(OperationTypes.READ);
 			operation.setSql(sql);
-			operation.setParameters(parameters);
+			operation.setParameters(null);
 			operation.setPaging(paging);
 
 			Result operationResult = this.access(operation);
 			if (operationResult != null) {
 				if (operationResult.isDone()) {
 					Table table = operationResult.getTable();
-					results = this.Parse(table);
+					results = this.parse(table);
 				}
 			}
 		}
@@ -311,22 +319,22 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 
 		T value = this.initializePojo();
 		if (value != null) {
-			String uuidField = null;
+			AbstractSqlBuilder sqlBuilder = this.getInstance().getSqlBuilder();
+			
+			String uuidName = null;
 			if (this.getInstance().isIdentifierCapital()) {
-				uuidField = AbstractDatabasePojo.UUID.toUpperCase();
+				uuidName = AbstractDatabasePojo.UUID.toUpperCase();
 			} else {
-				uuidField = AbstractDatabasePojo.UUID.toLowerCase();
+				uuidName = AbstractDatabasePojo.UUID.toLowerCase();
 			}
 			TableMap tableMap = this.getTableMap();
 			String tableName = tableMap.getName();
-
-			AbstractSqlBuilder sqlBuilder = this.getInstance().getSqlBuilder();
-			String sql = sqlBuilder.queryByUuid(tableName, uuidField);
+			String sql = sqlBuilder.getQueryByUuidSql(tableName, uuidName);
 			List<Object> parameters = new ArrayList<Object>();
 			parameters.add(uuid);
 
 			Operation operation = new Operation();
-			operation.setOperationType(OperationTypes.Read);
+			operation.setType(OperationTypes.READ);
 			operation.setSql(sql);
 			operation.setParameters(parameters);
 			operation.setPaging(null);
@@ -335,7 +343,7 @@ public abstract class AbstractView<T extends ViewPojo> extends AbstractDatabase 
 			if (operationResult != null) {
 				if (operationResult.isDone()) {
 					Table table = operationResult.getTable();
-					List<T> values = this.Parse(table);
+					List<T> values = this.parse(table);
 					if ((values != null) && (values.size() > 0)) {
 						result = values.get(0);
 					}

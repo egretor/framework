@@ -1,28 +1,28 @@
 package unknown.website.manage.module;
 
-import unknown.framework.module.annotation.Remark;
 import unknown.framework.module.annotation.Type;
 import unknown.framework.module.annotation.Types;
 
 /**
  * 用户
  */
-public class ManageUser extends AbstractManageTable {
-	@Type(value = Types.String)
-	@Remark(value = "帐号")
-	private String account;
-	@Type(value = Types.String)
-	@Remark(value = "密码")
-	private String password;
-	@Type(value = Types.Boolean)
-	@Remark(value = "特权")
-	private boolean prerogative;
-
+public class ManageUser extends AbstractManage {
 	/**
 	 * 帐号
-	 * 
-	 * @return 帐号
 	 */
+	@Type(value = Types.STRING)
+	private String account;
+	/**
+	 * 密码
+	 */
+	@Type(value = Types.STRING)
+	private String password;
+	/**
+	 * 特权
+	 */
+	@Type(value = Types.BOOLEAN)
+	private boolean prerogative;
+
 	public String getAccount() {
 		return account;
 	}
@@ -31,11 +31,6 @@ public class ManageUser extends AbstractManageTable {
 		this.account = account;
 	}
 
-	/**
-	 * 密码
-	 * 
-	 * @return 密码
-	 */
 	public String getPassword() {
 		return password;
 	}
@@ -44,11 +39,6 @@ public class ManageUser extends AbstractManageTable {
 		this.password = password;
 	}
 
-	/**
-	 * 特权
-	 * 
-	 * @return 特权
-	 */
 	public boolean isPrerogative() {
 		return prerogative;
 	}

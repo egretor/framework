@@ -7,18 +7,24 @@ import java.sql.Timestamp;
 import oracle.sql.CLOB;
 import oracle.sql.TIMESTAMP;
 
+import unknown.framework.module.annotation.Types;
 import unknown.framework.module.database.AbstractTypeConverter;
-import unknown.framework.module.pojo.FieldMap;
+import unknown.framework.module.database.FieldMap;
+import unknown.framework.utility.Trace;
 
+/**
+ * Oracle数据库类型转换器
+ */
 public class OracleTypeConverter extends AbstractTypeConverter {
 
 	@Override
-	public Object java(FieldMap fieldMap, Object value) {
+	public Object getJava(FieldMap fieldMap, Object value) {
 		Object result = value;
 
 		if (value != null) {
-			switch (fieldMap.getType()) {
-			case Boolean:
+			Types type = fieldMap.getType();
+			switch (type) {
+			case BOOLEAN:
 				BigDecimal bigDecimalValue = (BigDecimal) value;
 				if (bigDecimalValue.intValue() == 0) {
 					result = false;
@@ -26,20 +32,20 @@ public class OracleTypeConverter extends AbstractTypeConverter {
 					result = true;
 				}
 				break;
-			case Date:
+			case DATE:
 				TIMESTAMP timestampValue = (TIMESTAMP) value;
 				try {
 					result = timestampValue.dateValue();
-				} catch (SQLException e1) {
-					e1.printStackTrace();
+				} catch (SQLException e) {
+					Trace.getFramework().error(e);
 				}
 				break;
-			case Text:
+			case TEXT:
 				CLOB clobValue = (CLOB) value;
 				try {
 					result = clobValue.stringValue();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					Trace.getFramework().error(e);
 				}
 				break;
 			default:
@@ -51,7 +57,7 @@ public class OracleTypeConverter extends AbstractTypeConverter {
 	}
 
 	@Override
-	public Object database(Object value) {
+	public Object getDatabase(Object value) {
 		Object result = value;
 
 		if (value != null) {
@@ -59,6 +65,7 @@ public class OracleTypeConverter extends AbstractTypeConverter {
 			boolean once = true;
 			while (once) {
 				once = false;
+
 				if (classType.equals(java.util.Date.class)) {
 					java.util.Date dateValue = (java.util.Date) value;
 					result = new Timestamp(dateValue.getTime());

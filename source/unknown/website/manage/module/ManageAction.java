@@ -1,22 +1,18 @@
 package unknown.website.manage.module;
 
-import unknown.framework.module.annotation.Remark;
 import unknown.framework.module.annotation.Type;
 import unknown.framework.module.annotation.Types;
 
 /**
  * Action
  */
-public class ManageAction extends AbstractManageTable {
-	@Type(value = Types.Boolean)
-	@Remark(value = "移除")
-	private boolean remove;
-
+public class ManageAction extends AbstractManage {
 	/**
 	 * 移除
-	 * 
-	 * @return 移除
 	 */
+	@Type(value = Types.BOOLEAN)
+	private boolean remove;
+
 	public boolean isRemove() {
 		return remove;
 	}

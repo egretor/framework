@@ -6,14 +6,15 @@ import java.util.List;
  * 数据库表数据类
  */
 public class Table {
-	private List<String> fields;
-	private List<Row> rows;
-
 	/**
 	 * 字段集合
-	 * 
-	 * @return 字段集合
 	 */
+	private List<String> fields;
+	/**
+	 * 行数据集合
+	 */
+	private List<Row> rows;
+
 	public List<String> getFields() {
 		return fields;
 	}
@@ -22,11 +23,6 @@ public class Table {
 		this.fields = fields;
 	}
 
-	/**
-	 * 行数据集合
-	 * 
-	 * @return 行数据集合
-	 */
 	public List<Row> getRows() {
 		return rows;
 	}

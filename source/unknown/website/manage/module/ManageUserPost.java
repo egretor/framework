@@ -1,25 +1,23 @@
 package unknown.website.manage.module;
 
-import unknown.framework.module.annotation.Remark;
 import unknown.framework.module.annotation.Type;
 import unknown.framework.module.annotation.Types;
 
 /**
  * 用户的岗位
  */
-public class ManageUserPost extends AbstractManageTable {
-	@Type(value = Types.Uuid)
-	@Remark(value = "用户编号")
-	private String userId;
-	@Type(value = Types.Uuid)
-	@Remark(value = "岗位编号")
-	private String postId;
-
+public class ManageUserPost extends AbstractManage {
 	/**
 	 * 用户编号
-	 * 
-	 * @return 用户编号
 	 */
+	@Type(value = Types.UUID)
+	private String userId;
+	/**
+	 * 岗位编号
+	 */
+	@Type(value = Types.UUID)
+	private String postId;
+
 	public String getUserId() {
 		return userId;
 	}
@@ -28,11 +26,6 @@ public class ManageUserPost extends AbstractManageTable {
 		this.userId = userId;
 	}
 
-	/**
-	 * 岗位编号
-	 * 
-	 * @return 岗位编号
-	 */
 	public String getPostId() {
 		return postId;
 	}

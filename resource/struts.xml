@@ -3,19 +3,26 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-	<constant name="struts.devMode" value="true" />
+	<constant name="struts.devMode" value="false" />
 
-	<package name="struts-secutiry" extends="struts-default">
+	<package name="struts-secutiry" extends="json-default">
 		<interceptors>
 			<interceptor name="securityInterceptor"
 				class="unknown.website.interceptor.SecurityInterceptor">
 			</interceptor>
 			<interceptor-stack name="secutiryStack">
-				<interceptor-ref name="defaultStack"></interceptor-ref>
+				<!-- <interceptor-ref name="defaultStack"></interceptor-ref> <interceptor-ref 
+					name="json"></interceptor-ref> -->
 				<interceptor-ref name="securityInterceptor"></interceptor-ref>
 			</interceptor-stack>
 		</interceptors>
 		<default-interceptor-ref name="secutiryStack" />
+
+		<global-results>
+			<result name="json" type="json">
+				<param name="noCache">true</param>
+			</result>
+		</global-results>
 	</package>
 
 	<include file="unknown/website/manage/struts.xml"></include>

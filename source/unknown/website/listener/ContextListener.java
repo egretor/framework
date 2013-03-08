@@ -7,9 +7,11 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import unknown.framework.business.database.Driver;
+import unknown.framework.module.database.AbstractSqlBuilder;
+import unknown.framework.module.database.AbstractTypeConverter;
 import unknown.framework.module.database.Instance;
-import unknown.website.ManageInstance;
+import unknown.framework.utility.Trace;
+import unknown.website.Website;
 
 /**
  * Application Lifecycle Listener implementation class ContextListener
@@ -18,52 +20,115 @@ import unknown.website.ManageInstance;
 @WebListener
 public class ContextListener implements ServletContextListener,
 		ServletContextAttributeListener {
+	/**
+	 * 网站目录键
+	 */
 	private final static String WEBSITE_DIRECTORY_KEY = "WebsiteDirectoryKey";
+
+	/**
+	 * 网站目录
+	 */
+	private static String WEBSITE_DIRECTORY;
+	/**
+	 * 网站URL
+	 */
+	private static String WEBSITE_URL;
+
+	public static String getWebSiteDirectory() {
+		return WEBSITE_DIRECTORY;
+	}
+
+	public static String getWebsiteUrl() {
+		return WEBSITE_URL;
+	}
+
+	/**
+	 * 初始化网站目录
+	 * 
+	 * @param servletContext
+	 */
+	private void initializeWebsiteDirectory(ServletContext servletContext) {
+		String websiteDirectoryKey = servletContext
+				.getInitParameter(ContextListener.WEBSITE_DIRECTORY_KEY);
+		ContextListener.WEBSITE_DIRECTORY = servletContext.getRealPath("/");
+		System.setProperty(websiteDirectoryKey,
+				ContextListener.WEBSITE_DIRECTORY);
+	}
+
+	/**
+	 * 初始化网站URL
+	 * 
+	 * @param servletContext
+	 */
+	private void initializeWebsiteUrl(ServletContext servletContext) {
+		ContextListener.WEBSITE_URL = servletContext.getContextPath();
+	}
+
+	/**
+	 * 初始化数据库实例
+	 * 
+	 * @param servletContext
+	 * @param instanceName
+	 *            实例名称
+	 * @return
+	 */
+	private Instance initializeInstance(ServletContext servletContext,
+			String instanceName) {
+		Instance result = new Instance();
+
+		String driverKey = String.format("%s.Driver", instanceName);
+		String urlKey = String.format("%s.Url", instanceName);
+		String userKey = String.format("%s.User", instanceName);
+		String passwordKey = String.format("%s.Password", instanceName);
+		String identifierCapitalKey = String.format("%s.IdentifierCapital",
+				instanceName);
+		String typeConverterKey = String.format("%s.TypeConverter",
+				instanceName);
+		String sqlBuilderKey = String.format("%s.SqlBuilder", instanceName);
+
+		String driver = servletContext.getInitParameter(driverKey);
+		String url = servletContext.getInitParameter(urlKey);
+		String user = servletContext.getInitParameter(userKey);
+		String password = servletContext.getInitParameter(passwordKey);
+		boolean identifierCapital = false;
+		AbstractTypeConverter typeConverter = null;
+		AbstractSqlBuilder sqlBuilder = null;
+
+		String identifierCapitalText = servletContext
+				.getInitParameter(identifierCapitalKey);
+		String typeConverterText = servletContext
+				.getInitParameter(typeConverterKey);
+		String sqlBuilderText = servletContext.getInitParameter(sqlBuilderKey);
+
+		identifierCapital = Boolean.parseBoolean(identifierCapitalText);
+		try {
+			typeConverter = (AbstractTypeConverter) Class.forName(
+					typeConverterText).newInstance();
+			sqlBuilder = (AbstractSqlBuilder) Class.forName(sqlBuilderText)
+					.newInstance();
+		} catch (InstantiationException e) {
+			Trace.getFramework().error(e);
+		} catch (IllegalAccessException e) {
+			Trace.getFramework().error(e);
+		} catch (ClassNotFoundException e) {
+			Trace.getFramework().error(e);
+		}
+
+		result.setDriver(driver);
+		result.setUrl(url);
+		result.setUser(user);
+		result.setPassword(password);
+		result.setIdentifierCapital(identifierCapital);
+		result.setTypeConverter(typeConverter);
+		result.setSqlBuilder(sqlBuilder);
+
+		return result;
+	}
 
 	/**
 	 * Default constructor.
 	 */
 	public ContextListener() {
-	}
-
-	private static String websiteDirectory;
-
-	public static String getWebSiteDirectory() {
-		return ContextListener.websiteDirectory;
-	}
-
-	private static String website;
-
-	public static String getWebsite() {
-		return ContextListener.website;
-	}
-
-	private void initializeWebsiteDirectory(ServletContext servletContext) {
-		String websiteDirectoryKey = servletContext
-				.getInitParameter(ContextListener.WEBSITE_DIRECTORY_KEY);
-		ContextListener.websiteDirectory = servletContext.getRealPath("/");
-		System.setProperty(websiteDirectoryKey,
-				ContextListener.websiteDirectory);
-	}
-
-	private void initializeWebsite(ServletContext servletContext) {
-		ContextListener.website = servletContext.getContextPath();
-	}
-
-	private Instance initializeInstance(ServletContext servletContext,
-			String instanceName) {
-		Instance result = new Instance();
-
-		String urlKey = String.format("%s.Url", instanceName);
-		String userKey = String.format("%s.User", instanceName);
-		String passwordKey = String.format("%s.Password", instanceName);
-
-		result.setName(instanceName);
-		result.setUrl(servletContext.getInitParameter(urlKey));
-		result.setUser(servletContext.getInitParameter(userKey));
-		result.setPassword(servletContext.getInitParameter(passwordKey));
-
-		return result;
 	}
 
 	/**
@@ -73,18 +138,11 @@ public class ContextListener implements ServletContextListener,
 		ServletContext servletContext = event.getServletContext();
 
 		this.initializeWebsiteDirectory(servletContext);
-		this.initializeWebsite(servletContext);
+		this.initializeWebsiteUrl(servletContext);
 
-		Driver.registerDriver();
-
-		Instance manageInstanceOracle = this.initializeInstance(servletContext,
-				ManageInstance.ORACLE);
-		Instance manageInstanceMySQL = this.initializeInstance(servletContext,
-				ManageInstance.MYSQL);
-		String manageInstanceName = servletContext
-				.getInitParameter(ManageInstance.NAME);
-		ManageInstance.initialize(manageInstanceName, manageInstanceOracle,
-				manageInstanceMySQL);
+		Instance websiteInstance = this.initializeInstance(servletContext,
+				Website.INSTANCE_NAME);
+		Website.setInstance(websiteInstance);
 	}
 
 	/**

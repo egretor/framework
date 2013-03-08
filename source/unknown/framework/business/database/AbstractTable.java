@@ -6,19 +6,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import unknown.framework.module.database.AbstractSqlBuilder;
+import unknown.framework.module.database.FieldMap;
 import unknown.framework.module.database.OperationTypes;
 import unknown.framework.module.database.Result;
 import unknown.framework.module.database.Operation;
+import unknown.framework.module.database.TableMap;
 import unknown.framework.module.pojo.AbstractDatabasePojo;
-import unknown.framework.module.pojo.FieldMap;
-import unknown.framework.module.pojo.TableMap;
-import unknown.framework.module.pojo.TablePojo;
 import unknown.framework.utility.Trace;
 
 /**
- * 表
+ * 表类
+ * 
+ * @param <T>
+ *            数据库实体
  */
-public abstract class AbstractTable<T extends TablePojo> extends
+public abstract class AbstractTable<T extends AbstractDatabasePojo> extends
 		AbstractView<T> {
 	/**
 	 * 唯一值
@@ -27,7 +29,7 @@ public abstract class AbstractTable<T extends TablePojo> extends
 	 *            实体对象
 	 * @return 实体对象集合
 	 */
-	public abstract List<T> Unique(T value);
+	public abstract List<T> queryUnique(T value);
 
 	/**
 	 * 删除引用数据
@@ -58,7 +60,7 @@ public abstract class AbstractTable<T extends TablePojo> extends
 		boolean result = false;
 
 		if (value != null) {
-			List<T> uniqueValues = this.Unique(value);
+			List<T> uniqueValues = this.queryUnique(value);
 			if (uniqueValues != null) {
 				if (uniqueValues.size() > 1) {
 					result = true;
@@ -87,8 +89,9 @@ public abstract class AbstractTable<T extends TablePojo> extends
 	 *            实体对象
 	 * @return 操作结果
 	 */
-	public Results save(T value) {
-		Results result = Results.Fail;
+	public Message save(T value) {
+		Message result = new Message();
+		result.setType(MessageTypes.FAIL);
 
 		if (value != null) {
 			String uuid = value.getUuid();
@@ -110,50 +113,47 @@ public abstract class AbstractTable<T extends TablePojo> extends
 	 *            数据库实体
 	 * @return 操作结果
 	 */
-	public Results insert(T value) {
-		Results result = Results.Fail;
+	public Message insert(T value) {
+		Message result = new Message();
+		result.setType(MessageTypes.FAIL);
 
 		if (value != null) {
 			boolean has = this.hasSame(value);
 			if (has) {
-				result = Results.HasSame;
+				result.setType(MessageTypes.HAS_SAME);
 			} else {
+				Operation operation = new Operation();
+
+				AbstractSqlBuilder sqlBuilder = this.getInstance()
+						.getSqlBuilder();
 				TableMap tableMap = this.getTableMap();
-				List<FieldMap> fieldMaps = tableMap.getFields();
+				List<FieldMap> fieldMaps = tableMap.getFieldMaps();
 
-				if (fieldMaps != null) {
-					if (fieldMaps.size() > 0) {
-						List<Object> parameters = new ArrayList<Object>();
-						for (int i = 0; i < fieldMaps.size(); i++) {
-							FieldMap fieldMap = fieldMaps.get(i);
-							Method method = fieldMap.getGetter();
+				String sql = sqlBuilder.getInsertSql(value, tableMap);
+				List<Object> parameters = new ArrayList<Object>();
+				for (int i = 0; i < fieldMaps.size(); i++) {
+					FieldMap fieldMap = fieldMaps.get(i);
+					Method method = fieldMap.getGetter();
 
-							try {
-								parameters.add(method.invoke(value));
-							} catch (IllegalArgumentException e) {
-								Trace.logger().error(e);
-							} catch (IllegalAccessException e) {
-								Trace.logger().error(e);
-							} catch (InvocationTargetException e) {
-								Trace.logger().error(e);
-							}
-						}
+					try {
+						parameters.add(method.invoke(value));
+					} catch (IllegalArgumentException e) {
+						Trace.getFramework().error(e);
+					} catch (IllegalAccessException e) {
+						Trace.getFramework().error(e);
+					} catch (InvocationTargetException e) {
+						Trace.getFramework().error(e);
+					}
+				}
 
-						AbstractSqlBuilder sqlBuilder = this.getInstance()
-								.getSqlBuilder();
-						String sql = sqlBuilder.insert(value, tableMap);
+				operation.setType(OperationTypes.WRITE);
+				operation.setSql(sql);
+				operation.setParameters(parameters);
 
-						Operation task = new Operation();
-						task.setOperationType(OperationTypes.Write);
-						task.setSql(sql);
-						task.setParameters(parameters);
-
-						Result taskResult = this.access(task);
-						if (taskResult != null) {
-							if (taskResult.isDone()) {
-								result = Results.Success;
-							}
-						}
+				Result taskResult = this.access(operation);
+				if (taskResult != null) {
+					if (taskResult.isDone()) {
+						result.setType(MessageTypes.SUCCESS);
 					}
 				}
 			}
@@ -169,57 +169,55 @@ public abstract class AbstractTable<T extends TablePojo> extends
 	 *            数据库实体
 	 * @return 操作结果
 	 */
-	public Results update(T value) {
-		Results result = Results.Fail;
+	public Message update(T value) {
+		Message result = new Message();
+		result.setType(MessageTypes.FAIL);
 
 		if (value != null) {
 			boolean has = this.hasSame(value);
 			if (has) {
-				result = Results.HasSame;
+				result.setType(MessageTypes.HAS_SAME);
 			} else {
-				String uuidField = null;
-				if (this.getInstance().isIdentifierCapital()) {
-					uuidField = AbstractDatabasePojo.UUID.toUpperCase();
-				} else {
-					uuidField = AbstractDatabasePojo.UUID.toLowerCase();
-				}
+				Operation operation = new Operation();
+
+				AbstractSqlBuilder sqlBuilder = this.getInstance()
+						.getSqlBuilder();
 				TableMap tableMap = this.getTableMap();
 				List<FieldMap> fieldMaps = tableMap.getOthers();
+				String uuidName = null;
+				if (this.getInstance().isIdentifierCapital()) {
+					uuidName = AbstractDatabasePojo.UUID.toUpperCase();
+				} else {
+					uuidName = AbstractDatabasePojo.UUID.toLowerCase();
+				}
 
-				if (fieldMaps != null) {
-					if (fieldMaps.size() > 0) {
-						List<Object> parameters = new ArrayList<Object>();
-						for (int i = 0; i < fieldMaps.size(); i++) {
-							FieldMap fieldMap = fieldMaps.get(i);
-							Method method = fieldMap.getGetter();
+				String sql = sqlBuilder
+						.getUpdateSql(value, uuidName, tableMap);
+				List<Object> parameters = new ArrayList<Object>();
+				for (int i = 0; i < fieldMaps.size(); i++) {
+					FieldMap fieldMap = fieldMaps.get(i);
+					Method method = fieldMap.getGetter();
 
-							try {
-								parameters.add(method.invoke(value));
-							} catch (IllegalArgumentException e) {
-								Trace.logger().error(e);
-							} catch (IllegalAccessException e) {
-								Trace.logger().error(e);
-							} catch (InvocationTargetException e) {
-								Trace.logger().error(e);
-							}
-						}
-						parameters.add(value.getUuid());
+					try {
+						parameters.add(method.invoke(value));
+					} catch (IllegalArgumentException e) {
+						Trace.getFramework().error(e);
+					} catch (IllegalAccessException e) {
+						Trace.getFramework().error(e);
+					} catch (InvocationTargetException e) {
+						Trace.getFramework().error(e);
+					}
+				}
+				parameters.add(value.getUuid());
 
-						AbstractSqlBuilder sqlBuilder = this.getInstance()
-								.getSqlBuilder();
-						String sql = sqlBuilder.update(value, uuidField, tableMap);
+				operation.setType(OperationTypes.WRITE);
+				operation.setSql(sql);
+				operation.setParameters(parameters);
 
-						Operation task = new Operation();
-						task.setOperationType(OperationTypes.Write);
-						task.setSql(sql);
-						task.setParameters(parameters);
-
-						Result taskResult = this.access(task);
-						if (taskResult != null) {
-							if (taskResult.isDone()) {
-								result = Results.Success;
-							}
-						}
+				Result taskResult = this.access(operation);
+				if (taskResult != null) {
+					if (taskResult.isDone()) {
+						result.setType(MessageTypes.SUCCESS);
 					}
 				}
 			}
@@ -235,8 +233,8 @@ public abstract class AbstractTable<T extends TablePojo> extends
 	 *            数据库实体
 	 * @return 操作结果
 	 */
-	public Results delete(T value) {
-		Results result = Results.Fail;
+	public Message delete(T value) {
+		Message result = new Message();
 
 		result = this.delete(value, false);
 
@@ -252,8 +250,9 @@ public abstract class AbstractTable<T extends TablePojo> extends
 	 *            级联
 	 * @return 操作结果
 	 */
-	public Results delete(T value, boolean cascade) {
-		Results result = Results.Fail;
+	public Message delete(T value, boolean cascade) {
+		Message result = new Message();
+		result.setType(MessageTypes.FAIL);
 
 		if (value != null) {
 			boolean done = true;
@@ -263,33 +262,32 @@ public abstract class AbstractTable<T extends TablePojo> extends
 			if (done) {
 				boolean has = this.hasReference(value);
 				if (has) {
-					result = Results.HasReference;
+					result.setType(MessageTypes.HAS_REFERENCE);
 				} else {
-					String uuidField = null;
-					if (this.getInstance().isIdentifierCapital()) {
-						uuidField = AbstractDatabasePojo.UUID.toUpperCase();
-					} else {
-						uuidField = AbstractDatabasePojo.UUID.toLowerCase();
-					}
-					TableMap tableMap = this.getTableMap();
-					String tableName = tableMap.getName();
-
 					AbstractSqlBuilder sqlBuilder = this.getInstance()
 							.getSqlBuilder();
+					TableMap tableMap = this.getTableMap();
+					String tableName = tableMap.getName();
+					String uuidName = null;
+					if (this.getInstance().isIdentifierCapital()) {
+						uuidName = AbstractDatabasePojo.UUID.toUpperCase();
+					} else {
+						uuidName = AbstractDatabasePojo.UUID.toLowerCase();
+					}
 
-					String sql = sqlBuilder.delete(tableName, uuidField);
+					String sql = sqlBuilder.getDeleteSql(tableName, uuidName);
 					List<Object> parameters = new ArrayList<Object>();
 					parameters.add(value.getUuid());
 
 					Operation task = new Operation();
-					task.setOperationType(OperationTypes.Write);
+					task.setType(OperationTypes.WRITE);
 					task.setSql(sql);
 					task.setParameters(parameters);
 
 					Result taskResult = this.access(task);
 					if (taskResult != null) {
 						if (taskResult.isDone()) {
-							result = Results.Success;
+							result.setType(MessageTypes.SUCCESS);
 						}
 					}
 				}

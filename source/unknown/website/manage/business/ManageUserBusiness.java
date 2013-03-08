@@ -3,34 +3,35 @@ package unknown.website.manage.business;
 import java.util.ArrayList;
 import java.util.List;
 
+import unknown.framework.module.database.AbstractSqlBuilder;
 import unknown.framework.module.database.Operation;
 import unknown.framework.module.database.OperationTypes;
 import unknown.framework.module.database.Result;
-import unknown.website.ManageInstance;
 import unknown.website.manage.module.ManageUser;
 
 public class ManageUserBusiness extends AbstractTableBusiness<ManageUser> {
-	public final static String QUERY_BY_ACCOUNT = String.format(
-			"QueryByAccount@%s", ManageUserBusiness.class.getName());
+	public final static String QUERY_BY_ACCOUNT = "QUERY_BY_ACCOUNT";
 
 	@Override
-	public List<ManageUser> Unique(ManageUser value) {
+	public List<ManageUser> queryUnique(ManageUser value) {
 		List<ManageUser> results = null;
 
-		String sql = ManageInstance.getInstance().getSql(
+		AbstractSqlBuilder sqlBuilder = this.getInstance().getSqlBuilder();
+
+		String sql = sqlBuilder.getSql(ManageUserBusiness.class.getName(),
 				ManageUserBusiness.QUERY_BY_ACCOUNT);
 		List<Object> parameters = new ArrayList<Object>();
 		parameters.add(value.getAccount());
 
 		Operation operation = new Operation();
-		operation.setOperationType(OperationTypes.Read);
+		operation.setType(OperationTypes.READ);
 		operation.setSql(sql);
 		operation.setParameters(parameters);
 		operation.setPaging(null);
 		Result result = this.access(operation);
 		if (result != null) {
 			if (result.isDone()) {
-				results = this.Parse(result.getTable());
+				results = this.parse(result.getTable());
 			}
 		}
 
@@ -39,7 +40,7 @@ public class ManageUserBusiness extends AbstractTableBusiness<ManageUser> {
 
 	@Override
 	public boolean deleteReference(ManageUser value) {
-		return false;
+		return true;
 	}
 
 	@Override

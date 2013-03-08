@@ -1,7 +1,7 @@
 package unknown.framework.module.database;
 
 /**
- * 分页类
+ * 分页器类
  */
 public class Paging {
 	/**
@@ -17,15 +17,19 @@ public class Paging {
 	 */
 	public final static int MAXIMUM_ROWS_PER_PAGE = Integer.MAX_VALUE;
 
-	private int currentPage = Paging.MINIMUM_PAGE;
-	private int rowsPerPage = Paging.MAXIMUM_ROWS_PER_PAGE;
-	private int rowCount = 0;
-
 	/**
 	 * 当前页
-	 * 
-	 * @return 当前页
 	 */
+	private int currentPage = Paging.MINIMUM_PAGE;
+	/**
+	 * 每页行数
+	 */
+	private int rowsPerPage = Paging.MAXIMUM_ROWS_PER_PAGE;
+	/**
+	 * 总行数
+	 */
+	private int rowCount = 0;
+
 	public int getCurrentPage() {
 		return currentPage;
 	}
@@ -36,26 +40,17 @@ public class Paging {
 		}
 	}
 
-	/**
-	 * 每页行数
-	 * 
-	 * @return 每页行数
-	 */
 	public int getRowsPerPage() {
 		return rowsPerPage;
 	}
 
 	public void setRowsPerPage(int rowsPerPage) {
-		if (rowsPerPage >= Paging.MINIMUM_ROWS_PER_PAGE) {
+		if ((rowsPerPage >= Paging.MINIMUM_ROWS_PER_PAGE)
+				&& (rowsPerPage <= Paging.MAXIMUM_ROWS_PER_PAGE)) {
 			this.rowsPerPage = rowsPerPage;
 		}
 	}
 
-	/**
-	 * 总行数
-	 * 
-	 * @return 总行数
-	 */
 	public int getRowCount() {
 		return rowCount;
 	}

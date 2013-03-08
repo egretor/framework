@@ -33,15 +33,26 @@
 		</layout>
 	</appender>
 
+	<!-- 简单的控制台记录适配器 -->
+	<appender name="simpleConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value=" %c %p %C %M %l %L %d%n %m%n" />
+		</layout>
+	</appender>
+
 	<logger name="unknown.framework.utility.Trace">
 		<level value="ALL"></level>
-		<appender-ref ref="consoleAppender" />
-		<appender-ref ref="dailyFileAppender" />
+		<appender-ref ref="simpleConsoleAppender" />
+	</logger>
+
+	<logger name="unknown.framework.business.database.AbstractDatabase">
+		<level value="ALL"></level>
+		<appender-ref ref="simpleConsoleAppender" />
 	</logger>
 
 	<logger name="com.opensymphony">
 		<level value="ERROR"></level>
-		<appender-ref ref="consoleAppender" />
+		<appender-ref ref="simpleConsoleAppender" />
 	</logger>
 
 </log4j:configuration>

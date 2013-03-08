@@ -1,25 +1,23 @@
 package unknown.website.manage.module;
 
-import unknown.framework.module.annotation.Remark;
 import unknown.framework.module.annotation.Type;
 import unknown.framework.module.annotation.Types;
 
 /**
- * 岗位的Url
+ * 岗位的URL
  */
-public class ManagePostUrl extends AbstractManageTable {
-	@Type(value = Types.Uuid)
-	@Remark(value = "岗位编号")
-	private String postId;
-	@Type(value = Types.Uuid)
-	@Remark(value = "Url编号")
-	private String urlId;
-
+public class ManagePostUrl extends AbstractManage {
 	/**
 	 * 岗位编号
-	 * 
-	 * @return 岗位编号
 	 */
+	@Type(value = Types.UUID)
+	private String postId;
+	/**
+	 * URL编号
+	 */
+	@Type(value = Types.UUID)
+	private String urlId;
+
 	public String getPostId() {
 		return postId;
 	}
@@ -28,11 +26,6 @@ public class ManagePostUrl extends AbstractManageTable {
 		this.postId = postId;
 	}
 
-	/**
-	 * Url编号
-	 * 
-	 * @return Url编号
-	 */
 	public String getUrlId() {
 		return urlId;
 	}

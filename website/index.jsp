@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Framework</title>
 <link rel="stylesheet"
 	href="resource/javascript/dojo/dijit/themes/claro/claro.css" />
 <link rel="stylesheet"

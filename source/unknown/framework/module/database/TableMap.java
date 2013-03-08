@@ -1,21 +1,29 @@
-package unknown.framework.module.pojo;
+package unknown.framework.module.database;
 
 import java.util.List;
 
+
 /**
- * 表映射类
+ * 数据库表映射类
  */
 public class TableMap {
-	private String name;
-	private FieldMap major;
-	private List<FieldMap> others;
-	private List<FieldMap> fields;
-
 	/**
 	 * 名称
-	 * 
-	 * @return 名称
 	 */
+	private String name;
+	/**
+	 * 主键字段
+	 */
+	private FieldMap major;
+	/**
+	 * 主键字段除外的其他字段
+	 */
+	private List<FieldMap> others;
+	/**
+	 * 所有字段
+	 */
+	private List<FieldMap> fieldMaps;
+
 	public String getName() {
 		return name;
 	}
@@ -24,11 +32,6 @@ public class TableMap {
 		this.name = name;
 	}
 
-	/**
-	 * 主键
-	 * 
-	 * @return 主键
-	 */
 	public FieldMap getMajor() {
 		return major;
 	}
@@ -37,11 +40,6 @@ public class TableMap {
 		this.major = major;
 	}
 
-	/**
-	 * 其他字段集合
-	 * 
-	 * @return 其他字段集合
-	 */
 	public List<FieldMap> getOthers() {
 		return others;
 	}
@@ -50,16 +48,11 @@ public class TableMap {
 		this.others = others;
 	}
 
-	/**
-	 * 字段集合
-	 * 
-	 * @return 字段集合
-	 */
-	public List<FieldMap> getFields() {
-		return fields;
+	public List<FieldMap> getFieldMaps() {
+		return fieldMaps;
 	}
 
-	public void setFields(List<FieldMap> fields) {
-		this.fields = fields;
+	public void setFieldMaps(List<FieldMap> fieldMaps) {
+		this.fieldMaps = fieldMaps;
 	}
 }

@@ -1,12 +1,27 @@
 package unknown.framework.module.database;
 
-import unknown.framework.module.pojo.FieldMap;
 
 /**
- * 类型转换类
+ * 类型转换器抽象类
  */
 public abstract class AbstractTypeConverter {
-	public abstract Object java(FieldMap fieldMap, Object value);
+	/**
+	 * 获取Java值
+	 * 
+	 * @param fieldMap
+	 *            字段映射
+	 * @param value
+	 *            数据库值
+	 * @return Java值
+	 */
+	public abstract Object getJava(FieldMap fieldMap, Object value);
 
-	public abstract Object database(Object value);
+	/**
+	 * 获取数据库值
+	 * 
+	 * @param value
+	 *            Java值
+	 * @return 数据库值
+	 */
+	public abstract Object getDatabase(Object value);
 }

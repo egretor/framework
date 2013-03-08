@@ -5,6 +5,10 @@ package unknown.framework.business.database;
  */
 public class Convention {
 	/**
+	 * 回车换行
+	 */
+	public final static String ENTER = System.getProperty("line.separator");
+	/**
 	 * 数据库标识符分隔符
 	 */
 	protected final static char SEPARATOR = '_';
@@ -28,7 +32,7 @@ public class Convention {
 	/**
 	 * 数据库标识符编码为编程语言标识符
 	 * 
-	 * TEMPLATE_TABLE编码为TemplateTable
+	 * TEMPLATE_TABLE编码为TemplateTable或templateTable
 	 * 
 	 * @param value
 	 *            数据库标识符
@@ -42,12 +46,12 @@ public class Convention {
 		if (value != null) {
 			if (!value.isEmpty()) {
 				StringBuilder stringBuilder = new StringBuilder();
+
 				boolean upper = capitalize;
 				for (int i = 0; i < value.length(); i++) {
 					char current = value.charAt(i);
 					if ((i > 0) && (current == Convention.SEPARATOR)) {
 						upper = true;
-						continue;
 					} else {
 						if (upper) {
 							current = Character.toUpperCase(current);
@@ -58,6 +62,7 @@ public class Convention {
 						upper = false;
 					}
 				}
+
 				result = stringBuilder.toString();
 			}
 		}
@@ -67,6 +72,8 @@ public class Convention {
 
 	/**
 	 * 编程语言标识符解码为数据库标识符
+	 * 
+	 * TemplateTable或templateTable编码为TEMPLATE_TABLE或template_table
 	 * 
 	 * @param value
 	 *            编程语言标识符
@@ -80,6 +87,7 @@ public class Convention {
 		if (value != null) {
 			if (!value.isEmpty()) {
 				StringBuilder stringBuilder = new StringBuilder();
+
 				for (int i = 0; i < value.length(); i++) {
 					char current = value.charAt(i);
 					if ((i > 0) && (Character.isUpperCase(current))) {
@@ -87,6 +95,7 @@ public class Convention {
 					}
 					stringBuilder.append(current);
 				}
+
 				if (identifierCapital) {
 					result = stringBuilder.toString().toUpperCase();
 				} else {
@@ -121,6 +130,7 @@ public class Convention {
 				if (value.length() > 1) {
 					stringBuilder.append(value.substring(1));
 				}
+
 				result = stringBuilder.toString();
 			}
 		}
@@ -154,6 +164,7 @@ public class Convention {
 				if (value.length() > 1) {
 					stringBuilder.append(value.substring(1));
 				}
+
 				result = stringBuilder.toString();
 			}
 		}

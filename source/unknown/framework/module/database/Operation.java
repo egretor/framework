@@ -6,30 +6,31 @@ import java.util.List;
  * 数据库操作类
  */
 public class Operation {
-
-	private OperationTypes operationType;
+	/**
+	 * 类型
+	 */
+	private OperationTypes type;
+	/**
+	 * SQL语句
+	 */
 	private String sql;
+	/**
+	 * 参数
+	 */
 	private List<Object> parameters;
+	/**
+	 * 分页器
+	 */
 	private Paging paging;
 
-	/**
-	 * 操作类型
-	 * 
-	 * @return 操作类型
-	 */
-	public OperationTypes getOperationType() {
-		return operationType;
+	public OperationTypes getType() {
+		return type;
 	}
 
-	public void setOperationType(OperationTypes operationType) {
-		this.operationType = operationType;
+	public void setType(OperationTypes type) {
+		this.type = type;
 	}
 
-	/**
-	 * SQL
-	 * 
-	 * @return SQL
-	 */
 	public String getSql() {
 		return sql;
 	}
@@ -38,11 +39,6 @@ public class Operation {
 		this.sql = sql;
 	}
 
-	/**
-	 * 参数集合
-	 * 
-	 * @return 参数集合
-	 */
 	public List<Object> getParameters() {
 		return parameters;
 	}
@@ -51,11 +47,6 @@ public class Operation {
 		this.parameters = parameters;
 	}
 
-	/**
-	 * 分页
-	 * 
-	 * @return 分页
-	 */
 	public Paging getPaging() {
 		return paging;
 	}

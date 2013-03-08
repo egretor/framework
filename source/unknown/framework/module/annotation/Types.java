@@ -1,7 +1,7 @@
 package unknown.framework.module.annotation;
 
 /**
- * 类型枚举
+ * 注解类型枚举
  */
 public enum Types {
 	/**
@@ -13,7 +13,7 @@ public enum Types {
 	 * 
 	 * Oracle: VARCHAR(32)
 	 */
-	Uuid,
+	UUID,
 	/**
 	 * 字符串类型
 	 * 
@@ -23,7 +23,7 @@ public enum Types {
 	 * 
 	 * Oracle: VARCHAR(4000)
 	 */
-	String,
+	STRING,
 	/**
 	 * 文本类型
 	 * 
@@ -33,7 +33,7 @@ public enum Types {
 	 * 
 	 * Oracle: CLOB
 	 */
-	Text,
+	TEXT,
 	/**
 	 * 布尔类型
 	 * 
@@ -43,7 +43,7 @@ public enum Types {
 	 * 
 	 * Oracle: NUMBER(1)
 	 */
-	Boolean,
+	BOOLEAN,
 	/**
 	 * 日期类型
 	 * 
@@ -53,7 +53,7 @@ public enum Types {
 	 * 
 	 * Oracle: TIMESTAMP
 	 */
-	Date,
+	DATE,
 	/**
 	 * 整数类型
 	 * 
@@ -63,7 +63,7 @@ public enum Types {
 	 * 
 	 * Oracle: NUMBER(16)
 	 */
-	Integer,
+	INTEGER,
 	/**
 	 * 长整数类型
 	 * 
@@ -73,7 +73,7 @@ public enum Types {
 	 * 
 	 * Oracle: NUMBER(32)
 	 */
-	Long,
+	LONG,
 	/**
 	 * 浮点数类型
 	 * 
@@ -83,7 +83,7 @@ public enum Types {
 	 * 
 	 * Oracle: NUMBER(29,9)
 	 */
-	Double,
+	DOUBLE,
 	/**
 	 * 货币类型（分）
 	 * 
@@ -93,5 +93,5 @@ public enum Types {
 	 * 
 	 * Oracle: NUMBER(32)
 	 */
-	Currency
+	CURRENCY
 }

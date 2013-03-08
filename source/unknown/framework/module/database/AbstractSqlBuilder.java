@@ -4,189 +4,189 @@ import java.util.HashMap;
 import java.util.Map;
 
 import unknown.framework.module.pojo.AbstractDatabasePojo;
-import unknown.framework.module.pojo.TableMap;
 
 /**
- * SQL生成器
+ * SQL语句生成器抽象类
  */
 public abstract class AbstractSqlBuilder {
-	/**
-	 * 分隔符
-	 */
-	protected final static String SEPARATOR = "@";
 
 	/**
-	 * 新增SQL名称
+	 * 新增SQL语句名称
 	 */
-	protected final static String INSERT_SQL_NAME = "insert";
+	protected final static String INSERT_SQL_NAME = "@INSERT";
 
 	/**
-	 * 修改SQL名称
+	 * 修改SQL语句名称
 	 */
-	protected final static String UPDATE_SQL_NAME = "update";
+	protected final static String UPDATE_SQL_NAME = "@UPDATE";
 
 	/**
-	 * SQL缓存
+	 * SQL集合
 	 */
-	protected static Map<String, String> sqlCache = new HashMap<String, String>();
+	protected static Map<String, Map<String, String>> SQLS = new HashMap<String, Map<String, String>>();
 
 	/**
-	 * 缓存键
+	 * 获取SQL语句
 	 * 
-	 * @param value
-	 *            实体对象
+	 * @param className
+	 *            类名称
 	 * @param sqlName
-	 *            SQL名称
-	 * @return 缓存键
+	 *            SQL语句名称
+	 * @return SQL语句
 	 */
-	protected String cacheKey(AbstractDatabasePojo value, String sqlName) {
+	public String getSql(String className, String sqlName) {
 		String result = null;
 
-		if (value != null) {
-			result = String.format("%s%s%s", sqlName,
-					AbstractSqlBuilder.SEPARATOR, value.getClass().getName());
+		Map<String, String> sqls = new HashMap<String, String>();
+
+		boolean hasClass = AbstractSqlBuilder.SQLS.containsKey(className);
+		if (hasClass) {
+			sqls = AbstractSqlBuilder.SQLS.get(className);
+		}
+
+		boolean hasSql = sqls.containsKey(sqlName);
+		if (hasSql) {
+			result = sqls.get(sqlName);
 		}
 
 		return result;
 	}
 
 	/**
-	 * 获取缓存SQL
+	 * 赋值SQL语句
 	 * 
-	 * @param key
-	 *            缓存键
-	 * @return 缓存SQL
+	 * @param className
+	 *            类名称
+	 * @param sqlName
+	 *            SQL语句名称
+	 * @param sql
+	 *            SQL语句
 	 */
-	protected String getCache(String key) {
-		String result = null;
+	public void setSql(String className, String sqlName, String sql) {
+		Map<String, String> sqls = new HashMap<String, String>();
 
-		if (key != null) {
-			if (!key.isEmpty()) {
-				if (AbstractSqlBuilder.sqlCache.containsKey(key)) {
-					result = AbstractSqlBuilder.sqlCache.get(key);
-				}
-			}
+		boolean hasClass = AbstractSqlBuilder.SQLS.containsKey(className);
+		if (hasClass) {
+			sqls = AbstractSqlBuilder.SQLS.get(className);
 		}
-
-		return result;
+		sqls.put(sqlName, sql);
+		AbstractSqlBuilder.SQLS.put(className, sqls);
 	}
 
 	/**
-	 * 复制缓存SQL
-	 * 
-	 * @param key
-	 *            缓存键
-	 * @param value
-	 *            缓存SQL
-	 */
-	protected void setCache(String key, String value) {
-		if (key != null) {
-			if (!key.isEmpty()) {
-				if (!AbstractSqlBuilder.sqlCache.containsKey(key)) {
-					AbstractSqlBuilder.sqlCache.put(key, value);
-				}
-			}
-		}
-	}
-
-	/**
-	 * 行数总计
+	 * 获取合计行数SQL语句
 	 * 
 	 * @param sql
-	 *            SQL
-	 * @return SQL
+	 *            原始SQL语句
+	 * @return 合计行数SQL语句
 	 */
-	public abstract String rowCount(String sql);
+	public abstract String getCountRowSql(String sql);
 
 	/**
-	 * 查询
+	 * 获取查询SQL语句
 	 * 
 	 * @param tableName
 	 *            表名称
-	 * @return SQL
+	 * @return 查询SQL语句
 	 */
-	public abstract String query(String tableName);
+	public abstract String getQuerySql(String tableName);
 
 	/**
-	 * 根据代理主键查询
+	 * 获取根据代理主键查询SQL语句
 	 * 
 	 * @param tableName
 	 *            表名称
-	 * @return SQL
+	 * @param uuidName
+	 *            代理主键名称
+	 * @return 根据代理主键查询SQL语句
 	 */
-	public abstract String queryByUuid(String tableName, String uuidField);
+	public abstract String getQueryByUuidSql(String tableName, String uuidName);
 
 	/**
-	 * 新增SQL实现
+	 * 获取新增SQL语句实现
 	 * 
 	 * @param value
 	 *            实体对象
-	 * @return SQL
+	 * @param tableMap
+	 *            表映射
+	 * @return 新增SQL语句
 	 */
-	protected abstract String insertImplement(AbstractDatabasePojo value,
+	protected abstract String getInsertSqlImplement(AbstractDatabasePojo value,
 			TableMap tableMap);
 
 	/**
-	 * 修改SQL实现
+	 * 获取新增SQL语句
 	 * 
 	 * @param value
 	 *            实体对象
-	 * @return SQL
+	 * @param tableMap
+	 *            表映射
+	 * @return 新增SQL语句
 	 */
-	protected abstract String updateImplement(AbstractDatabasePojo value,
-			String uuidField, TableMap tableMap);
-
-	/**
-	 * 新增SQL
-	 * 
-	 * @param value
-	 *            实体对象
-	 * @return SQL
-	 */
-	public String insert(AbstractDatabasePojo value, TableMap tableMap) {
+	public String getInsertSql(AbstractDatabasePojo value, TableMap tableMap) {
 		String result = null;
 
-		String key = this.cacheKey(value, AbstractSqlBuilder.INSERT_SQL_NAME);
-		result = this.getCache(key);
+		String className = value.getClass().getName();
+		String sqlName = AbstractSqlBuilder.INSERT_SQL_NAME;
+
+		result = this.getSql(className, sqlName);
 		if (result == null) {
-			result = this.insertImplement(value, tableMap);
-			this.setCache(key, result);
+			result = this.getInsertSqlImplement(value, tableMap);
+			this.setSql(className, sqlName, result);
 		}
 
 		return result;
 	}
 
 	/**
-	 * 修改SQL
+	 * 获取更新SQL语句实现
 	 * 
 	 * @param value
 	 *            实体对象
-	 * @return SQL
+	 * @param uuidName
+	 *            代理主键名称
+	 * @param tableMap
+	 *            表映射
+	 * @return 更新SQL语句
 	 */
-	public String update(AbstractDatabasePojo value, String uuidField,
+	protected abstract String getUpdateSqlImplement(AbstractDatabasePojo value,
+			String uuidName, TableMap tableMap);
+
+	/**
+	 * 获取更新SQL语句
+	 * 
+	 * @param value
+	 *            实体对象
+	 * @param uuidName
+	 *            代理主键名称
+	 * @param tableMap
+	 *            表映射
+	 * @return 更新SQL语句
+	 */
+	public String getUpdateSql(AbstractDatabasePojo value, String uuidName,
 			TableMap tableMap) {
 		String result = null;
 
-		String key = this.cacheKey(value, AbstractSqlBuilder.UPDATE_SQL_NAME);
-		result = this.getCache(key);
+		String className = value.getClass().getName();
+		String sqlName = AbstractSqlBuilder.UPDATE_SQL_NAME;
+
+		result = this.getSql(className, sqlName);
 		if (result == null) {
-			result = this.updateImplement(value, uuidField, tableMap);
-			this.setCache(key, result);
+			result = this.getUpdateSqlImplement(value, uuidName, tableMap);
+			this.setSql(className, sqlName, result);
 		}
 
 		return result;
 	}
 
 	/**
-	 * 删除SQL
+	 * 获取删除SQL语句
 	 * 
 	 * @param tableName
 	 *            表名称
-	 * @return SQL
+	 * @param uuidName
+	 *            代理主键名称
+	 * @return 删除SQL语句
 	 */
-	public abstract String delete(String tableName, String uuidField);
-
-	public abstract Object Encode(Class<?> classType, Object value);
-
-	public abstract Object Decode(Object value);
+	public abstract String getDeleteSql(String tableName, String uuidName);
 }

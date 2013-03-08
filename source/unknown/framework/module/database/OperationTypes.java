@@ -7,9 +7,9 @@ public enum OperationTypes {
 	/**
 	 * 读操作
 	 */
-	Read,
+	READ,
 	/**
 	 * 写操作
 	 */
-	Write
+	WRITE
 }

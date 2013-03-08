@@ -22,13 +22,17 @@ import unknown.framework.module.database.Table;
 import unknown.framework.module.database.Operation;
 
 /**
- * 数据库
+ * 数据库类
  */
 public abstract class AbstractDatabase {
 	/**
-	 * 链接缓存
+	 * 驱动集合
 	 */
-	protected final static Map<String, Connection> connectionCache = new HashMap<String, Connection>();
+	protected final static Map<String, Boolean> DRIVERS = new HashMap<String, Boolean>();
+	/**
+	 * 链接集合
+	 */
+	protected final static Map<String, Connection> CONNECTIONS = new HashMap<String, Connection>();
 
 	/**
 	 * 数据库实例
@@ -36,6 +40,34 @@ public abstract class AbstractDatabase {
 	 * @return 数据库实例
 	 */
 	public abstract Instance getInstance();
+
+	/**
+	 * 跟踪SQL
+	 * 
+	 * @param sql
+	 *            SQL语句
+	 * @param parameters
+	 *            参数
+	 */
+	private void traceSql(String sql, List<Object> parameters) {
+		String message = null;
+
+		StringBuilder stringBuilder = new StringBuilder();
+
+		stringBuilder.append(sql);
+		stringBuilder.append(Convention.ENTER);
+		if (parameters != null) {
+			for (int i = 0; i < parameters.size(); i++) {
+				stringBuilder.append("{");
+				stringBuilder.append(parameters.get(i));
+				stringBuilder.append("} ");
+			}
+		}
+
+		message = stringBuilder.toString();
+
+		Trace.getDatabase().info(message);
+	}
 
 	/**
 	 * 访问数据库
@@ -46,9 +78,12 @@ public abstract class AbstractDatabase {
 	 */
 	public Result access(Operation operation) {
 		Result result = null;
+
 		List<Operation> operations = new ArrayList<Operation>();
 		operations.add(operation);
+
 		List<Result> results = this.access(operations);
+
 		if ((results != null) && (results.size() > 0)) {
 			result = results.get(0);
 		}
@@ -68,21 +103,34 @@ public abstract class AbstractDatabase {
 
 		if (operations != null) {
 			Instance instance = this.getInstance();
-			String name = instance.getName();
+			String key = instance.getClass().getName();
+			String driver = instance.getDriver();
 			String url = instance.getUrl();
 			String user = instance.getUser();
 			String password = instance.getPassword();
 
+			boolean hasDriver = AbstractDatabase.DRIVERS.containsKey(driver);
+			if (!hasDriver) {
+				try {
+					Class.forName(driver);
+					AbstractDatabase.DRIVERS.put(driver, true);
+				} catch (ClassNotFoundException e) {
+					Trace.getFramework().error(e);
+				}
+			}
+
 			Connection connection = null;
-			if (AbstractDatabase.connectionCache.containsKey(name)) {
-				connection = AbstractDatabase.connectionCache.get(name);
+			boolean hasConnection = AbstractDatabase.CONNECTIONS
+					.containsKey(key);
+			if (hasConnection) {
+				connection = AbstractDatabase.CONNECTIONS.get(key);
 			} else {
 				try {
 					connection = DriverManager.getConnection(url, user,
 							password);
-					AbstractDatabase.connectionCache.put(name, connection);
+					AbstractDatabase.CONNECTIONS.put(key, connection);
 				} catch (SQLException e) {
-					Trace.logger().error(e);
+					Trace.getFramework().error(e);
 				}
 			}
 
@@ -110,52 +158,59 @@ public abstract class AbstractDatabase {
 		AbstractTypeConverter typeConverter = this.getInstance()
 				.getTypeConverter();
 		AbstractSqlBuilder sqlBuilder = this.getInstance().getSqlBuilder();
+
 		try {
 			for (int i = 0; i < operations.size(); i++) {
 				Result result = null;
+
 				Operation operation = operations.get(i);
 				if (operation != null) {
-					OperationTypes operationType = operation.getOperationType();
-					Paging paging = operation.getPaging();
+					OperationTypes operationType = operation.getType();
 					String sql = operation.getSql();
-					System.out.println(sql);
 					List<Object> parameters = operation.getParameters();
+					Paging paging = operation.getPaging();
+
+					this.traceSql(sql, parameters);
 
 					preparedStatement = connection.prepareStatement(sql);
+
 					preparedStatement.clearParameters();
 					if (parameters != null) {
 						int index = 0;
 						while (index < parameters.size()) {
 							Object value = parameters.get(index);
 							index++;
+
 							Object databaseValue = typeConverter
-									.database(value);
+									.getDatabase(value);
 							preparedStatement.setObject(index, databaseValue);
 						}
 					}
 
 					switch (operationType) {
-					case Read:
+					case READ:
 						if (paging == null) {
 							result = this.executeQuery(preparedStatement);
 						} else {
-							String rowCountSql = sqlBuilder.rowCount(sql);
+							String countRowSql = sqlBuilder.getCountRowSql(sql);
 							result = this.executePagingQuery(preparedStatement,
-									paging, rowCountSql);
+									paging, countRowSql);
 						}
 						break;
-					case Write:
+					case WRITE:
 						result = this.executeUpdate(preparedStatement);
 						break;
 					}
 
 					preparedStatement.close();
 				}
+
 				results.add(result);
 			}
 		} catch (SQLException e) {
-			Trace.logger().error(e);
+			Trace.getFramework().error(e);
 		}
+
 		return results;
 	}
 
@@ -169,7 +224,10 @@ public abstract class AbstractDatabase {
 	protected Result executeQuery(PreparedStatement preparedStatement) {
 		Result result = new Result();
 
+		result.setDone(false);
+
 		try {
+			Table table = new Table();
 			List<String> fields = new ArrayList<String>();
 			List<Row> rows = new ArrayList<Row>();
 
@@ -186,8 +244,8 @@ public abstract class AbstractDatabase {
 
 			while (resultSet.next()) {
 				Row row = new Row();
-				List<Object> values = new ArrayList<Object>();
 
+				List<Object> values = new ArrayList<Object>();
 				index = 0;
 				while (index < count) {
 					index++;
@@ -196,20 +254,19 @@ public abstract class AbstractDatabase {
 				}
 
 				row.setValues(values);
+
 				rows.add(row);
 			}
 
 			resultSet.close();
 
-			Table table = new Table();
 			table.setFields(fields);
 			table.setRows(rows);
 
 			result.setDone(true);
 			result.setTable(table);
 		} catch (SQLException e) {
-			result.setDone(false);
-			Trace.logger().error(e);
+			Trace.getFramework().error(e);
 		}
 
 		return result;
@@ -221,17 +278,19 @@ public abstract class AbstractDatabase {
 	 * @param preparedStatement
 	 *            语句
 	 * @param paging
-	 *            分页
-	 * @param rowCountSql
-	 *            行数总计SQL
+	 *            分页器
+	 * @param countRowSql
+	 *            合计行数SQL语句
 	 * @return 结果
 	 */
 	protected Result executePagingQuery(PreparedStatement preparedStatement,
-			Paging paging, String rowCountSql) {
+			Paging paging, String countRowSql) {
 		Result result = new Result();
 
+		result.setDone(false);
+
 		try {
-			// 查询数据
+			Table table = new Table();
 			List<String> fields = new ArrayList<String>();
 			List<Row> rows = new ArrayList<Row>();
 
@@ -253,8 +312,8 @@ public abstract class AbstractDatabase {
 			if (!resultSet.isAfterLast()) {
 				do {
 					Row row = new Row();
-					List<Object> values = new ArrayList<Object>();
 
+					List<Object> values = new ArrayList<Object>();
 					index = 0;
 					while (index < count) {
 						index++;
@@ -263,7 +322,9 @@ public abstract class AbstractDatabase {
 					}
 
 					row.setValues(values);
+
 					rows.add(row);
+
 					currentPageRowCount++;
 					if (currentPageRowCount == rowsPerPage) {
 						break;
@@ -273,24 +334,24 @@ public abstract class AbstractDatabase {
 
 			resultSet.close();
 
-			Table table = new Table();
 			table.setFields(fields);
 			table.setRows(rows);
-			// 计算总行数
+
 			int rowCount = 0;
-			resultSet = preparedStatement.executeQuery(rowCountSql);
+
+			resultSet = preparedStatement.executeQuery(countRowSql);
 			while (resultSet.next()) {
 				rowCount = resultSet.getInt(1);
 			}
 			resultSet.close();
+
 			paging.setRowCount(rowCount);
 
 			result.setDone(true);
 			result.setTable(table);
 			result.setPaging(paging);
 		} catch (SQLException e) {
-			result.setDone(false);
-			Trace.logger().error(e);
+			Trace.getFramework().error(e);
 		}
 
 		return result;
@@ -306,12 +367,13 @@ public abstract class AbstractDatabase {
 	protected Result executeUpdate(PreparedStatement preparedStatement) {
 		Result result = new Result();
 
+		result.setDone(false);
+
 		try {
 			preparedStatement.executeUpdate();
 			result.setDone(true);
 		} catch (SQLException e) {
-			result.setDone(false);
-			Trace.logger().error(e);
+			Trace.getFramework().error(e);
 		}
 
 		return result;
