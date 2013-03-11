@@ -32,6 +32,7 @@
 </script>
 </head>
 <body class="claro">
+	<s:property value="test" />
 </body>
 	</html>
 </s:if>

@@ -8,6 +8,10 @@
 		<action name="user!*" class="unknown.website.manage.application.ManageUserAction">
 			<result name="success">/manage/user/index.jsp</result>
 		</action>
+		
+		<action name="catalog!*" class="unknown.website.manage.application.ManageCatalogAction">
+			<result name="success">/manage/user/index.jsp</result>
+		</action>
 	</package>
 </struts>
 
